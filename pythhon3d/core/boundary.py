@@ -6,11 +6,7 @@ from typing import Callable
 
 class Boundary:
     def __init__(
-        self,
-        name: str,
-        faces_index: List[int],
-        imposed_dirichlet: Callable,
-        imposed_neumann: Callable,
+        self, name: str, faces_index: List[int], imposed_dirichlet: List[Callable], imposed_neumann: List[Callable],
     ):
         """
         ejbchbjs

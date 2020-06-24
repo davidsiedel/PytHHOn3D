@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import ndarray as Mat
-from HHO.Quadrature import *
-from HHO.Face import Face
+from core.quadrature import *
+from core.face import Face
 from typing import List
 from typing import Callable
 
@@ -136,9 +136,7 @@ class Cell:
                         # Multiplying the quadrature weight with the face
                         # volume.
                         # ------------------------------------------------------
-                        sub_sub_cell_weigh_Q = (
-                            sub_sub_cell_volume * sub_sub_cell_weigh_Q
-                        )
+                        sub_sub_cell_weigh_Q = sub_sub_cell_volume * sub_sub_cell_weigh_Q
                         # ------------------------------------------------------
                         # Adding the subfaces quadrature nodes and weights to
                         # those of the global solution.

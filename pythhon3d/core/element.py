@@ -3,9 +3,9 @@ from numpy import ndarray as Mat
 from scipy.linalg import block_diag
 from scipy.linalg import cholesky, solve_triangular, inv
 from typing import List
-from HHO.Basis import Basis
-from HHO.Face import Face
-from HHO.Cell import Cell
+from core.basis import Basis
+from core.face import Face
+from core.cell import Cell
 from typing import TypeVar
 
 # --------------------------------------------------------------------------------------
@@ -489,9 +489,7 @@ class Element:
         )
         return stabilization_bilinear_form_tensor
 
-    def get_cell_internal_load_vector(
-        self, cell: Cell, cell_basis: Basis, x: int
-    ) -> Mat:
+    def get_cell_internal_load_vector(self, cell: Cell, cell_basis: Basis, x: int) -> Mat:
         """
         jcbhezhbkbh
         """
