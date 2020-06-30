@@ -20,6 +20,7 @@ def parse_geof_file(geof_file_path):
         # ----------------------------------------------------------------------
         N_size_rows = int(c[i_line].rstrip().split(" ")[0])
         N_size_cols = int(c[i_line].rstrip().split(" ")[1])
+        problem_dimension = N_size_cols
         # ----------------------------------------------------------------------
         # skipping the line to the first nodes.
         # ----------------------------------------------------------------------
@@ -164,6 +165,7 @@ def parse_geof_file(geof_file_path):
         print("Nsets : {}".format(Nsets))
         # return N, C_nc, C_nf, C_cf, weights, Nsets, flags
         return (
+            problem_dimension,
             vertices,
             cells_vertices_connectivity_matrix,
             faces_vertices_connectivity_matrix,

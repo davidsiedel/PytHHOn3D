@@ -7,7 +7,7 @@ from core.boundary import Boundary
 
 
 class Face(Domain):
-    def __init__(self, face_vertices_matrix: Mat, k: int):
+    def __init__(self, shape: str, face_vertices_matrix: Mat, k: int):
         """
         """
         super().__init__(face_vertices_matrix)
@@ -151,8 +151,9 @@ class Face(Domain):
         p = self.reference_frame_transformation_matrix
         return ((p @ points_matrix.T).T)[:, cols]
 
+    @staticmethod
     def get_face_partition(
-        self, face_vertices_matrix_in_face_reference_frame: Mat, face_barycenter_vector_in_face_reference_frame: Mat
+        face_vertices_matrix_in_face_reference_frame: Mat, face_barycenter_vector_in_face_reference_frame: Mat
     ) -> Mat:
         """
         """

@@ -48,18 +48,26 @@ class Cell(Domain):
         vector_to_face = (p @ (cell_barycenter - face_barycenter).T).T
         return vector_to_face
 
-    def get_cell_partition(self, faces, cell_vertices_matrix) -> Mat:
+    def get_cell_partition(self, faces_vertices_matrix, cell_vertices_matrix) -> Mat:
         ""
         ""
         d = cell_vertices_matrix.shape[1]
+        number_of_faces = faces_vertices_matrix.shape[0]
         # --------------------------------------------------------------------------------------------------------------
         # Reading the problem dimension
         # --------------------------------------------------------------------------------------------------------------
         if d == 1:
             simplicial_sub_cells = [cell_vertices_matrix]
         if d == 2:
-            if len(faces) > d+1:
-                
+            if number_of_faces > d + 1:
+                simplicial_sub_cells = []
+                for i in range(number_of_faces):
+                    sub_cell_vertices_matrix = [
+                        face_vertices_matrix_in_face_reference_frame[i - 1, :],
+                        face_vertices_matrix_in_face_reference_frame[i, :],
+                        face_barycenter_vector_in_face_reference_frame[0],
+                    ]
+                    simplicial_sub_faces.append(np.array(sub_face_vertices_matrix))
             # ----------------------------------------------------------------------------------------------------------
             # getting the number of vertices.
             # ----------------------------------------------------------------------------
