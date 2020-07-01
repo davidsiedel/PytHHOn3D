@@ -8,23 +8,24 @@ import numpy as np
 
 
 class Polyhedron(Domain):
-    def __init__(self, vertices: Mat, connectivity_matrix: Mat):
+    def __init__(self, vertices: Mat, connectivity_matrix: Mat, polynomial_order: int):
         """
         connectivity_matrix de la forme [[0,1,2], [2,3,6], [2,8,5],...] avec la liste des noeuds en tableau organisés par face dans le repère local := declaration de l'element
         """
         if not vertices.shape[0] > 4 and not vertices.shape[1] == 2:
             raise TypeError("The domain dimensions do not match that of a polygon")
         else:
-            barycenter = Domain.get_domain_barycenter_vector(vertices_matrix)
+            barycenter = Domain.get_domain_barycenter_vector(vertices)
             simplicial_sub_domains = Polyhedron.get_polyhedron_simplicial_partition(
                 vertices, connectivity_matrix, barycenter
             )
+            print(simplicial_sub_domains)
             volume = 0.0
             quadrature_nodes, quadrature_weights = [], []
             for simplicial_sub_domain in simplicial_sub_domains:
                 simplex_volume = Tetrahedron.get_tetrahedron_volume(simplicial_sub_domain)
                 simplex_quadrature_nodes, simplex_quadrature_weights = DunavantRule.get_tetrahedron_quadrature(
-                    simplicial_sub_domain, simplex_volume
+                    simplicial_sub_domain, simplex_volume, polynomial_order
                 )
                 volume += simplex_volume
                 quadrature_nodes.append(simplex_quadrature_nodes)
@@ -45,9 +46,11 @@ class Polyhedron(Domain):
                 face_barycenter = Domain.get_domain_barycenter_vector(face_vertices)
                 sub_faces = Polygon.get_polygon_simplicial_partition(face_vertices, face_barycenter)
                 for sub_face in sub_faces:
-                    tetra = np.concatenate((sub_face, barycenter), axis=0)
-                    tetras.append(tetras)
+                    b = np.resize(barycenter, (1, 3))
+                    tetra = np.concatenate((sub_face, b), axis=0)
+                    tetras.append(tetra)
             else:
-                tetra = np.concatenate((face_vertices, barycenter), axis=0)
-                tetras.append(tetras)
+                b = np.resize(barycenter, (1, 3))
+                tetra = np.concatenate((face_vertices, b), axis=0)
+                tetras.append(tetra)
         return tetras
