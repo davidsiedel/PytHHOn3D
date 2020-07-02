@@ -1,6 +1,6 @@
 from tests import context
 
-from core.face2 import Face
+from core.face import Face
 import numpy as np
 import pytest
 from scipy import integrate

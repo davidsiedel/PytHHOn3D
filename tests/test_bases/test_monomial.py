@@ -1,6 +1,6 @@
 from tests import context
 
-from core.basis import Basis
+from bases.monomial import MonomialBasis
 import numpy as np
 import pytest
 
@@ -79,7 +79,7 @@ test_data_k_d = [
 
 @pytest.mark.parametrize("k,d, expected", test_data_k_d)
 def test_basis_pow_matrix(k, d, expected):
-    b = Basis(k, d)
+    b = MonomialBasis(k, d)
     assert (b.pow_matrix == expected).all()
 
 
@@ -130,7 +130,7 @@ test_data_k_d = [
 
 @pytest.mark.parametrize("k,d, expected", test_data_k_d)
 def test_basis_dim(k, d, expected):
-    b = Basis(k, d)
+    b = MonomialBasis(k, d)
     assert b.dim == expected
 
 
@@ -206,7 +206,7 @@ test_data_k_d += [
 
 @pytest.mark.parametrize("k,d, point, barycenter, volume, expected", test_data_k_d)
 def test_basis_phi_vector(k, d, point, barycenter, volume, expected):
-    b = Basis(k, d)
+    b = MonomialBasis(k, d)
     phi_vector = b.get_phi_vector(point, barycenter, volume)
     assert (np.abs(phi_vector - expected) < np.full((b.dim,), 1.0e-9)).all()
 
@@ -268,6 +268,6 @@ test_data_k_d += [
 
 @pytest.mark.parametrize("k, d, point, barycenter, volume, dx, expected", test_data_k_d)
 def test_basis_d_phi_vector(k, d, point, barycenter, volume, dx, expected):
-    b = Basis(k, d)
+    b = MonomialBasis(k, d)
     d_phi_vector = b.get_d_phi_vector(point, barycenter, volume, dx)
     assert (np.abs(d_phi_vector - expected) < np.full((b.dim,), 1.0e-9)).all()
