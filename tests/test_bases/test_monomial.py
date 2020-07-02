@@ -1,6 +1,6 @@
 from tests import context
 
-from bases.monomial import MonomialBasis
+from bases.monomial import ScaledMonomial
 import numpy as np
 import pytest
 
@@ -78,9 +78,9 @@ test_data_k_d = [
 
 
 @pytest.mark.parametrize("k,d, expected", test_data_k_d)
-def test_basis_pow_matrix(k, d, expected):
-    b = MonomialBasis(k, d)
-    assert (b.pow_matrix == expected).all()
+def test_basis_exponents(k, d, expected):
+    b = ScaledMonomial(k, d)
+    assert (b.exponents == expected).all()
 
 
 # ======================================================================================================================
@@ -129,9 +129,9 @@ test_data_k_d = [
 
 
 @pytest.mark.parametrize("k,d, expected", test_data_k_d)
-def test_basis_dim(k, d, expected):
-    b = MonomialBasis(k, d)
-    assert b.dim == expected
+def test_basis_dimension(k, d, expected):
+    b = ScaledMonomial(k, d)
+    assert b.basis_dimension == expected
 
 
 # ======================================================================================================================
@@ -206,9 +206,9 @@ test_data_k_d += [
 
 @pytest.mark.parametrize("k,d, point, barycenter, volume, expected", test_data_k_d)
 def test_basis_phi_vector(k, d, point, barycenter, volume, expected):
-    b = MonomialBasis(k, d)
+    b = ScaledMonomial(k, d)
     phi_vector = b.get_phi_vector(point, barycenter, volume)
-    assert (np.abs(phi_vector - expected) < np.full((b.dim,), 1.0e-9)).all()
+    assert (np.abs(phi_vector - expected) < np.full((b.basis_dimension,), 1.0e-9)).all()
 
 
 # ======================================================================================================================
@@ -268,6 +268,6 @@ test_data_k_d += [
 
 @pytest.mark.parametrize("k, d, point, barycenter, volume, dx, expected", test_data_k_d)
 def test_basis_d_phi_vector(k, d, point, barycenter, volume, dx, expected):
-    b = MonomialBasis(k, d)
+    b = ScaledMonomial(k, d)
     d_phi_vector = b.get_d_phi_vector(point, barycenter, volume, dx)
-    assert (np.abs(d_phi_vector - expected) < np.full((b.dim,), 1.0e-9)).all()
+    assert (np.abs(d_phi_vector - expected) < np.full((b.basis_dimension,), 1.0e-9)).all()

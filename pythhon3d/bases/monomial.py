@@ -2,21 +2,23 @@ import numpy as np
 from numpy import ndarray as Mat
 from scipy.special import binom
 
+from bases.basis import Basis
+
 # ----------------------------------------------------------------------------------------------------------------------
 # One has the following matrices for the whole mesh:
 # N, C_nc, C_nf, C_cf, weights, Nsets, flags
 # ----------------------------------------------------------------------------------------------------------------------
-class MonomialBasis:
+class ScaledMonomial(Basis):
     def __init__(
-        self, k: int, d: int,
+        self, polynomial_order: int, domain_dimension: int,
     ):
         """
         ================================================================================================================
         Class :
         ================================================================================================================
-        The MonomialBasis class provides a framework and methods to build a (scaled) polynomial
+        The ScaledMonomial class provides a framework and methods to build a (scaled) polynomial
         basis given a polynomial order and a spatial dimension.
-        The MonomialBasis class is then used in other classes to compute matrices through
+        The ScaledMonomial class is then used in other classes to compute matrices through
         quadrature rules.
         ================================================================================================================
         Parameters :
@@ -32,14 +34,15 @@ class MonomialBasis:
         - global_gradient_operator : the concatenation of gradients operators in all
         directions
         """
-        self.dim = int(binom(k + d, k,))
-        self.pow_matrix = self.get_pow_matrix(k, d,)
-        self.global_gradient_operator = []
-        for dx in range(d):
-            grad_dx = self.get_gradient_operator(k, d, dx)
-            self.global_gradient_operator.append(grad_dx)
+        super().__init__(polynomial_order, domain_dimension)
+        # self.basis_dimension = int(binom(polynomial_order + domain_dimension, polynomial_order,))
+        self.exponents = self.get_exponents(polynomial_order, domain_dimension,)
+        self.gradient_operators = []
+        for dx in range(domain_dimension):
+            grad_dx = self.get_gradient_operator(polynomial_order, domain_dimension, dx)
+            self.gradient_operators.append(grad_dx)
 
-    def get_pow_matrix(self, k: int, d: int) -> Mat:
+    def get_exponents(self, polynomial_order: int, domain_dimension: int) -> Mat:
         """
         ================================================================================================================
         Description :
@@ -74,32 +77,32 @@ class MonomialBasis:
             | x^1*y^1 |                               
             | x^2*y^0 |
         """
-        if d == 0:
+        if domain_dimension == 0:
             pow_matrix = np.array([[0.0]])
         else:
             pow_matrix = []
-            if d == 1:
-                for s in range(k + 1):
+            if domain_dimension == 1:
+                for s in range(polynomial_order + 1):
                     pow_matrix.append([s])
-            elif d == 2:
-                for k in range(k + 1):
-                    for l in range(k + 1):
-                        m = k - l
+            elif domain_dimension == 2:
+                for polynomial_order in range(polynomial_order + 1):
+                    for l in range(polynomial_order + 1):
+                        m = polynomial_order - l
                         pow_matrix.append(
                             [l, m,]
                         )
-            elif d == 3:
-                for k in range(k + 1):
-                    for l in range(k + 1):
-                        for m in range(k + 1):
-                            if not (l + m) > k:
-                                n = k - (l + m)
+            elif domain_dimension == 3:
+                for polynomial_order in range(polynomial_order + 1):
+                    for l in range(polynomial_order + 1):
+                        for m in range(polynomial_order + 1):
+                            if not (l + m) > polynomial_order:
+                                n = polynomial_order - (l + m)
                                 pow_matrix.append(
                                     [l, m, n,]
                                 )
         return np.array(pow_matrix, dtype=int,)
 
-    def get_gradient_operator(self, k: int, d: int, dx: int) -> Mat:
+    def get_gradient_operator(self, polynomial_order: int, domain_dimension: int, dx: int) -> Mat:
         """
         ================================================================================================================
         Description :
@@ -124,11 +127,11 @@ class MonomialBasis:
         # --------------------------------------------------------------------------------------------------------------
         # Initializing the conformal gradient operator with zeros
         # --------------------------------------------------------------------------------------------------------------
-        gradient_operator = np.zeros((self.dim, self.dim))
+        gradient_operator = np.zeros((self.basis_dimension, self.basis_dimension))
         # --------------------------------------------------------------------------------------------------------------
         # Copiying the exponent matrix
         # --------------------------------------------------------------------------------------------------------------
-        d_pow_matrix = np.copy(self.pow_matrix)
+        d_pow_matrix = np.copy(self.exponents)
         # --------------------------------------------------------------------------------------------------------------
         # Deriving a polynom, hence substracting a one-filled vector at the
         # derivative variable position
@@ -137,15 +140,15 @@ class MonomialBasis:
         # --------------------------------------------------------------------------------------------------------------
         # Building the conformal gradient operator
         # --------------------------------------------------------------------------------------------------------------
-        for i, coef in enumerate(self.pow_matrix[:, dx,]):
+        for i, coef in enumerate(self.exponents[:, dx,]):
             if not coef == 0:
-                for j, exponents in enumerate(self.pow_matrix):
+                for j, exponents in enumerate(self.exponents):
                     if (exponents == d_pow_matrix[i]).all():
                         gradient_operator[i, j] = coef
                         break
         return gradient_operator
 
-    def get_phi_vector(self, point: Mat, barycenter: Mat, volume: float,) -> Mat:
+    def get_phi_vector(self, point: Mat, centroid: Mat, volume: float,) -> Mat:
         """
         ================================================================================================================
         Description :
@@ -158,7 +161,7 @@ class MonomialBasis:
         Exemple :
         ================================================================================================================
         Let the unite square T = [0,1]*[0,1] in R^2, A = (0.1, 0.4) a point in T, and
-        B = (0.5, 0.5) the barycenter of T. The volume of T is 1.
+        B = (0.5, 0.5) the centroid of T. The volume of T is 1.
         Then, the polynomial valued vector of A in the scaled monomial basis of order 2
         in T is :
         phi_vector = | ((0.1-0.5)/1.)^0*((0.4-0.5)/1.)^0 |
@@ -168,13 +171,13 @@ class MonomialBasis:
                      | ((0.1-0.5)/1.)^1*((0.4-0.5)/1.)^1 |
                      | ((0.1-0.5)/1.)^2*((0.4-0.5)/1.)^0 |
         """
-        point_matrix = np.tile(point, (self.dim, 1,),)
-        barycenter_matrix = np.tile(barycenter, (self.dim, 1,),)
-        phi_matrix = ((point_matrix - barycenter_matrix) / volume) ** self.pow_matrix
+        point_matrix = np.tile(point, (self.basis_dimension, 1,),)
+        centroid_matrix = np.tile(centroid, (self.basis_dimension, 1,),)
+        phi_matrix = ((point_matrix - centroid_matrix) / volume) ** self.exponents
         phi_vector = np.prod(phi_matrix, axis=1,)
         return phi_vector
 
-    def get_d_phi_vector(self, point: Mat, barycenter: Mat, volume: float, dx: int,) -> Mat:
+    def get_d_phi_vector(self, point: Mat, centroid: Mat, volume: float, dx: int,) -> Mat:
         """
         ================================================================================================================
         Description :
@@ -187,7 +190,7 @@ class MonomialBasis:
         Exemple :
         ================================================================================================================
         Let the unite square T = [0,1]*[0,1] in R^2, A = (0.1, 0.4) a point in T, and
-        B = (0.5, 0.5) the barycenter of T. The volume of T is 1.
+        B = (0.5, 0.5) the centroid of T. The volume of T is 1.
         Then, the polynomial valued vector of A in the derivative of the scaled monomial
         basis of order 2 in T is :
         d_phi_vector = | 0*((0.1-0.5)/1.)^0*((0.4-0.5)/1.)^0     |
@@ -199,7 +202,7 @@ class MonomialBasis:
         Or equivalently :
         d_phi_vector = (1/volume) @ gradient_operator @ phi_vector
         """
-        grad_dx = self.global_gradient_operator[dx]
-        phi_vector = self.get_phi_vector(point, barycenter, volume)
+        grad_dx = self.gradient_operators[dx]
+        phi_vector = self.get_phi_vector(point, centroid, volume)
         d_phi_vector = (1.0 / volume) * (grad_dx @ phi_vector.T)
         return d_phi_vector

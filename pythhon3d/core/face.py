@@ -37,7 +37,9 @@ class Face(Domain):
         # --------------------------------------------------------------------------------------------------------------
         # Computing the mapping from the cell reference frame into the face hyperplane
         # --------------------------------------------------------------------------------------------------------------
-        vertices_in_face_reference_frame = self.get_points_in_face_reference_frame(vertices)
+        vertices_in_face_reference_frame = Face.get_points_in_face_reference_frame(
+            vertices, self.reference_frame_transformation_matrix
+        )
         # --------------------------------------------------------------------------------------------------------------
         # Getting integration points and face data
         # --------------------------------------------------------------------------------------------------------------
@@ -214,7 +216,8 @@ class Face(Domain):
         p = self.reference_frame_transformation_matrix
         return ((p @ vertices.T).T)[0, -1]
 
-    def get_points_in_face_reference_frame(self, points_matrix):
+    @staticmethod
+    def get_points_in_face_reference_frame(points_matrix: Mat, reference_frame_transformation_matrix: Mat):
         """
         ================================================================================================================
         Description :
@@ -229,10 +232,10 @@ class Face(Domain):
         ================================================================================================================
     
         """
-        problem_dimension = self.reference_frame_transformation_matrix.shape[1]
+        p = reference_frame_transformation_matrix
+        problem_dimension = p.shape[1]
         if problem_dimension == 1 or problem_dimension == 2:
             cols = [0]
         if problem_dimension == 3:
             cols = [0, 1]
-        p = self.reference_frame_transformation_matrix
         return ((p @ points_matrix.T).T)[:, cols]

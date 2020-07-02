@@ -1,226 +1,229 @@
 import numpy as np
 from numpy import ndarray as Mat
-from core.quadrature import *
-from core.face import Face
-from typing import List
-from typing import Callable
 
-# ------------------------------------------------------------------------------
-# One has the following matrices for the whole mesh:
-# N, C_nc, C_nf, C_cf, weights, Nsets, flags
-# ------------------------------------------------------------------------------
-class Cell:
-    def __init__(
-        self,
-        cell_nodes: Mat,
-        faces: List[Face],
-        faces_nodes: List[Mat],
-        internal_load: Callable,
-        k_Q: int,
-    ):
-        """
-        """
-        self.barycenter = self.get_cell_barycenter(cell_nodes)
-        (
-            self.volume,
-            self.nodes_Q,
-            self.weigh_Q,
-            self.signs,
-        ) = self.get_cell_integration_data(faces, faces_nodes, k_Q)
-        self.internal_load = internal_load
-        return
+from shapes.domain import Domain
 
-    def get_cell_barycenter(self, nodes: Mat) -> Mat:
-        """
-        Getting the barycenter of any d dimensional spatial domain given its nodes
-        Returns :
-        - barycenter : the cell barycenter
-        """
-        barycenter = [np.mean(nodes[:, i]) for i in range(nodes.shape[1])]
-        return np.array(barycenter)
+from shapes.segment import Segment
+from shapes.triangle import Triangle
+from shapes.polygon import Polygon
+from shapes.tetrahedron import Tetrahedron
+from shapes.polyhedron import Polyhedron
 
-    def get_vector_to_face(self, face: Face, cell_barycenter: Mat) -> Mat:
-        """
-        """
-        vector_to_face = (face.p_matrix @ (cell_barycenter - face.barycenter).T).T
-        return vector_to_face
 
-    def get_cell_integration_data(
-        self, faces: List[Face], faces_nodes: List[Mat], k_Q: int
-    ) -> (float, Mat, Mat, Mat):
+class Cell(Domain):
+    def __init__(self, vertices: Mat, connectivity_matrix: Mat, polynomial_order: int):
         """
+        ================================================================================================================
+        Class :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Parameters :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Attributes :
+        ================================================================================================================
+        
         """
-        cell_volume = 0.0
-        signs = []
-        cell_nodes_Q, cell_weigh_Q = [], []
-        # ----------------------------------------------------------------------
-        # For each face of the cell.
-        # ----------------------------------------------------------------------
-        for face, face_nodes in zip(faces, faces_nodes):
-            # ------------------------------------------------------------------
-            # Computing the distance from the cell barycenter to the face, and
-            # the sign of the normal vector, depending on the location of the
-            # cell barycenter to that of the face.
-            # ------------------------------------------------------------------
-            vector_to_face = self.get_vector_to_face(face, self.barycenter)
-            if vector_to_face[-1] > 0:
-                n_sign = 1.0
-            else:
-                n_sign = -1.0
-            signs.append(n_sign)
-            distance_to_face = np.abs(vector_to_face[-1])
-            # ------------------------------------------------------------------
-            # Computing the subcell quadrature points and faces.
-            # ------------------------------------------------------------------
-            # ##################################################################
-            # 2D FACES IN 3D CELLS
-            # ##################################################################
-            cell_dimension = np.array([face.barycenter]).shape[1]
-            if cell_dimension == 3:
-                # --------------------------------------------------------------
-                # Computing the volume of the pyramidal subcell with base that
-                # of the face and height distance_to_face.
-                # --------------------------------------------------------------
-                sub_cell_volume = (1.0 / 3.0) * face.volume * distance_to_face
-                if face_nodes.shape[0] > 4:
-                    # ----------------------------------------------------------
-                    # Initializing the vector to contain quadrature points and
-                    # weights for each subcell.
-                    # ----------------------------------------------------------
-                    sub_cell_nodes_Q = []
-                    sub_cell_weigh_Q = []
-                    # ----------------------------------------------------------
-                    # Creating subfaces segmentations.
-                    # ----------------------------------------------------------
-                    face_nodes_shifted = np.roll(face_nodes, 1, axis=0)
-                    face_barycenter_matrix = np.tile(
-                        face.barycenter, (face_nodes.shape[0], 1)
-                    )
-                    triangular_sub_faces = [
-                        np.array(
-                            [
-                                face_nodes_shifted[i],
-                                face_nodes[i],
-                                face_barycenter_matrix[i],
-                            ]
-                        )
-                        for i in range(face_nodes.shape[0])
-                    ]
-                    # ----------------------------------------------------------
-                    # Initializing the vector to contain quadrature points and
-                    # weights for each subface.
-                    # ----------------------------------------------------------
-                    for sub_face_nodes in triangular_sub_faces:
-                        # ------------------------------------------------------
-                        # Compute each subface triangle volume.
-                        # ------------------------------------------------------
-                        sub_face_volume = (
-                            np.norm(sub_face_nodes[1] - sub_face_nodes[0])
-                            * np.norm(sub_face_nodes[2] - sub_face_nodes[0])
-                            / 2.0
-                        )
-                        sub_sub_cell_volume = distance_to_face * sub_face_volume
-                        sub_sub_cell_nodes = np.concatenate(
-                            (sub_face_nodes, [self.barycenter]), axis=0
-                        )
-                        # ------------------------------------------------------
-                        # Compute quadrature nodes and weights.
-                        # ------------------------------------------------------
-                        (
-                            sub_sub_cell_nodes_Q,
-                            sub_sub_cell_weigh_Q,
-                        ) = get_unite_tetrahedron_quadrature(
-                            sub_sub_cell_nodes, sub_sub_cell_volume, k_Q
-                        )
-                        # ------------------------------------------------------
-                        # Multiplying the quadrature weight with the face
-                        # volume.
-                        # ------------------------------------------------------
-                        sub_sub_cell_weigh_Q = sub_sub_cell_volume * sub_sub_cell_weigh_Q
-                        # ------------------------------------------------------
-                        # Adding the subfaces quadrature nodes and weights to
-                        # those of the global solution.
-                        # ------------------------------------------------------
-                        sub_cell_nodes_Q.append(sub_sub_cell_nodes_Q)
-                        sub_cell_weigh_Q.append(sub_sub_cell_weigh_Q)
-                    sub_cell_nodes_Q = np.concatenate(sub_cell_nodes_Q, axis=0)
-                    sub_cell_weigh_Q = np.concatenate(sub_cell_weigh_Q, axis=0)
-                elif face_nodes.shape[0] == 3:
-                    # sub_face_volume = (
-                    #     np.norm(face_nodes[1] - face_nodes[0])
-                    #     * np.norm(face_nodes[2] - face_nodes[0])
-                    #     / 2.0
-                    # )
-                    sub_cell_nodes = np.concatenate(
-                        (face_nodes, [self.barycenter]), axis=0
-                    )
-                    # ----------------------------------------------------------
-                    # Compute quadrature nodes and weights.
-                    # ----------------------------------------------------------
-                    (
-                        sub_cell_nodes_Q,
-                        sub_cell_weigh_Q,
-                    ) = get_unite_tetrahedron_quadrature(
-                        sub_cell_nodes, sub_cell_volume, k_Q
-                    )
-                    # ----------------------------------------------------------
-                    # Multiplying the quadrature weight with the face
-                    # volume.
-                    # ----------------------------------------------------------
-                    sub_cell_weigh_Q = sub_cell_volume * sub_cell_weigh_Q
-            # ##################################################################
-            # 1D FACES IN 2D CELLS
-            # ##################################################################
-            elif cell_dimension == 2:
-                # --------------------------------------------------------------
-                # Computing the volume of the pyramidal subcell with base that
-                # of the face and height distance_to_face.
-                # --------------------------------------------------------------
-                sub_cell_volume = (1.0 / 2.0) * face.volume * distance_to_face
-                sub_cell_nodes = np.concatenate((face_nodes, [self.barycenter]), axis=0)
-                # --------------------------------------------------------------
-                # Compute quadrature nodes and weights.
-                # --------------------------------------------------------------
-                (sub_cell_nodes_Q, sub_cell_weigh_Q,) = get_unite_triangle_quadrature(
-                    sub_cell_nodes, sub_cell_volume, k_Q
-                )
-                # --------------------------------------------------------------
-                # Multiplying the quadrature weight with the face
-                # volume.
-                # --------------------------------------------------------------
-                sub_cell_weigh_Q = sub_cell_volume * sub_cell_weigh_Q
-            # ##################################################################
-            # 0D FACES IN 1D CELLS
-            # ##################################################################
-            elif cell_dimension == 1:
-                # --------------------------------------------------------------
-                # Computing the volume of the pyramidal subcell with base that
-                # of the face and height distance_to_face.
-                # --------------------------------------------------------------
-                sub_cell_volume = (1.0 / 1.0) * face.volume * distance_to_face
-                sub_cell_nodes = np.concatenate((face_nodes, [self.barycenter]), axis=0)
-                # --------------------------------------------------------------
-                # Compute quadrature nodes and weights.
-                # --------------------------------------------------------------
-                (sub_cell_nodes_Q, sub_cell_weigh_Q,) = get_unite_segment_quadrature(
-                    sub_cell_nodes, sub_cell_volume, k_Q
-                )
-                # --------------------------------------------------------------
-                # Multiplying the quadrature weight with the face
-                # volume.
-                # --------------------------------------------------------------
-                sub_cell_weigh_Q = sub_cell_volume * sub_cell_weigh_Q
-            # ##################################################################
-            # 0D FACES IN 2D CELLS
-            # ##################################################################
-            cell_nodes_Q.append(sub_cell_nodes_Q)
-            cell_weigh_Q.append(sub_cell_weigh_Q)
-            cell_volume += sub_cell_volume
-        # ----------------------------------------------------------------------
-        # Concatenating quadrature points and weights for the whole cell
-        # ----------------------------------------------------------------------
-        signs = np.array(signs, dtype=int)
-        # signs = create_vector(signs, dtype=int)
-        cell_nodes_Q = np.concatenate(cell_nodes_Q, axis=0)
-        cell_weigh_Q = np.concatenate(cell_weigh_Q, axis=0)
-        return cell_volume, cell_nodes_Q, cell_weigh_Q, signs
+        cell_shape = Cell.get_cell_shape(vertices)
+        if face_shape == "SEGMENT":
+            c = Segment(vertices, polynomial_order)
+            centroid = c.centroid
+            volume = c.volume
+            quadrature_nodes = c.quadrature_nodes
+            quadrature_weights = c.quadrature_weights
+            del c
+        if face_shape == "TRIANGLE":
+            c = Triangle(vertices, polynomial_order)
+            centroid = c.centroid
+            volume = c.volume
+            quadrature_nodes = c.quadrature_nodes
+            quadrature_weights = c.quadrature_weights
+            del c
+        if face_shape == "POLYGON":
+            c = Polygon(vertices, polynomial_order)
+            centroid = c.centroid
+            volume = c.volume
+            quadrature_nodes = c.quadrature_nodes
+            quadrature_weights = c.quadrature_weights
+            del c
+        if face_shape == "TETRAHEDRON":
+            c = Tetrahedron(vertices, polynomial_order)
+            centroid = c.centroid
+            volume = c.volume
+            quadrature_nodes = c.quadrature_nodes
+            quadrature_weights = c.quadrature_weights
+            del c
+        if face_shape == "POLYHEDRON":
+            c = Polyhedron(vertices, connectivity_matrix, polynomial_order)
+            centroid = c.centroid
+            volume = c.volume
+            quadrature_nodes = c.quadrature_nodes
+            quadrature_weights = c.quadrature_weights
+            del c
+        super().__init__(centroid, volume, quadrature_nodes, quadrature_weights)
+
+    @staticmethod
+    def get_cell_shape(vertices: Mat) -> str:
+        """
+        ================================================================================================================
+        Description :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Parameters :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Exemple :
+        ================================================================================================================
+        
+        """
+        number_of_vertices = vertices.shape[0]
+        problem_dimension = vertices.shape[1]
+        if number_of_vertices == 2 and problem_dimension == 1:
+            cell_shape = "SEGMENT"
+        elif number_of_vertices == 3 and problem_dimension == 2:
+            cell_shape = "TRIANGLE"
+        elif number_of_vertices == 4 and problem_dimension == 2:
+            cell_shape = "QUADRANGLE"
+        elif number_of_vertices > 4 and problem_dimension == 2:
+            cell_shape = "POLYGON"
+        elif number_of_vertices == 4 and problem_dimension == 3:
+            cell_shape = "TETRAHEDRON"
+        elif number_of_vertices == 6 and problem_dimension == 3:
+            cell_shape = "PRISM"
+        elif number_of_vertices == 8 and problem_dimension == 3:
+            cell_shape = "HEXAHEDRON"
+        elif number_of_vertices > 8 and problem_dimension == 3:
+            cell_shape = "POLYHEDRON"
+        else:
+            raise NameError("no match")
+        return cell_shape
+
+    # def get_vector_to_face(self, face: Face) -> Mat:
+    #     """
+    #     ================================================================================================================
+    #     Description :
+    #     ================================================================================================================
+
+    #     ================================================================================================================
+    #     Parameters :
+    #     ================================================================================================================
+
+    #     ================================================================================================================
+    #     Exemple :
+    #     ================================================================================================================
+
+    #     """
+    #     p = face.reference_frame_transformation_matrix
+    #     cell_barycenter = self.barycenter_vector
+    #     face_barycenter = face.barycenter_vector
+    #     vector_to_face = (p @ (cell_barycenter - face_barycenter).T).T
+    #     return vector_to_face
+
+
+# import numpy as np
+# from numpy import ndarray as Mat
+# from core.quadrature import Quadrature
+# from core.domain import Domain
+# from core.face import Face
+# from typing import List
+# from typing import Callable
+
+
+# class Cell(Domain):
+#     def __init__(
+#         self,
+#         cell_vertices_matrix: Mat,
+#         faces: List[Face],
+#         faces_vertices_matrix: List[Mat],
+#         internal_load: Callable,
+#         k: int,
+#     ):
+#         ""
+#         ""
+#         super().__init__(cell_vertices_matrix)
+
+#         # --------------------------------------------------------------------------------------------------------------
+#         # initializing data
+#         # --------------------------------------------------------------------------------------------------------------
+#         cell_volume = 0.0
+#         signs = []
+#         cell_quadrature_points, cell_quadrature_weights = [], []
+#         # --------------------------------------------------------------------------------------------------------------
+#         # for every face
+#         # --------------------------------------------------------------------------------------------------------------
+#         for face, face_vertices_matrix in zip(faces, faces_vertices_matrix):
+#             vector_to_face = self.get_vector_to_face(face)
+#             distance_to_face = vector_to_face[:, -1][0]
+#             if distance_to_face > 0.0:
+#                 sign = 1
+#             else:
+#                 sign = -1
+#             signs.append(sign)
+#             distance_to_face = np.abs(distance_to_face)
+
+#     def get_vector_to_face(self, face: Face) -> Mat:
+#         """
+#         """
+#         p = face.reference_frame_transformation_matrix
+#         cell_barycenter = self.barycenter_vector
+#         face_barycenter = face.barycenter_vector
+#         vector_to_face = (p @ (cell_barycenter - face_barycenter).T).T
+#         return vector_to_face
+
+#     def get_cell_partition(self, faces_vertices_matrix, cell_vertices_matrix) -> Mat:
+#         ""
+#         ""
+#         d = cell_vertices_matrix.shape[1]
+#         number_of_faces = faces_vertices_matrix.shape[0]
+#         # --------------------------------------------------------------------------------------------------------------
+#         # Reading the problem dimension
+#         # --------------------------------------------------------------------------------------------------------------
+#         if d == 1:
+#             simplicial_sub_cells = [cell_vertices_matrix]
+#         if d == 2:
+#             if number_of_faces > d + 1:
+#                 simplicial_sub_cells = []
+#                 for i in range(number_of_faces):
+#                     sub_cell_vertices_matrix = [
+#                         face_vertices_matrix_in_face_reference_frame[i - 1, :],
+#                         face_vertices_matrix_in_face_reference_frame[i, :],
+#                         face_barycenter_vector_in_face_reference_frame[0],
+#                     ]
+#                     simplicial_sub_faces.append(np.array(sub_face_vertices_matrix))
+#             # ----------------------------------------------------------------------------------------------------------
+#             # getting the number of vertices.
+#             # ----------------------------------------------------------------------------
+#             number_of_vertices = face_vertices_matrix_in_face_reference_frame.shape[0]
+#             # ----------------------------------------------------------------------------
+#             # If the face is no simplex (i.e. of the number of vertices is greater than
+#             # (d-1)+1 = d), proceed to its segmentation in simplices.
+#             # ----------------------------------------------------------------------------
+#             if number_of_vertices > d + 1:
+#                 simplicial_sub_faces = []
+#                 for i in range(number_of_vertices):
+#                     sub_face_vertices_matrix = [
+#                         face_vertices_matrix_in_face_reference_frame[i - 1, :],
+#                         face_vertices_matrix_in_face_reference_frame[i, :],
+#                         face_barycenter_vector_in_face_reference_frame[0],
+#                     ]
+#                     simplicial_sub_faces.append(np.array(sub_face_vertices_matrix))
+#             else:
+#                 simplicial_sub_faces = [face_vertices_matrix_in_face_reference_frame]
+#         return simplicial_sub_faces
+#         return
+
+#     def get_sub_cell_volume(self, face: Face, distance_to_face: float) -> Mat:
+#         ""
+#         ""
+#         d = face.barycenter_vector.shape[1]
+#         if d == 3:
+#             sub_cell_volume = (1.0 / 3.0) * face.volume * distance_to_face
+#         if d == 2:
+#             sub_cell_volume = (1.0 / 2.0) * face.volume * distance_to_face
+#         if d == 1:
+#             sub_cell_volume = (1.0 / 1.0) * face.volume * distance_to_face
+#         return sub_cell_volume
