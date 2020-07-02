@@ -1,4 +1,4 @@
-from pythhon3d import app
+from pythhon3d import solve
 
 if __name__ == "__main__":
-    app.run()
+    solve()
