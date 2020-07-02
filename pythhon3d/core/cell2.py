@@ -1,5 +1,28 @@
 import numpy as np
 from numpy import ndarray as Mat
+from typing import List
+
+from shapes.domain import Domain
+
+from shapes.segment import Segment
+from shapes.triangle import Triangle
+from shapes.polygon import Polygon
+from shapes.tetrahedron import Tetrahedron
+from shapes.polyhedron import Polyhedron
+
+
+# from core.domain import Domain
+# from core.quadrature import Quadrature
+# from core.boundary import Boundary
+
+
+class Cell(Domain):
+    def __init__(self, shape: str, vertices: Mat, polynomial_order: int):
+
+
+
+import numpy as np
+from numpy import ndarray as Mat
 from core.quadrature import Quadrature
 from core.domain import Domain
 from core.face import Face

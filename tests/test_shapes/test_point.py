@@ -7,8 +7,9 @@ from shapes.point import Point
 def test_point_centroid():
     point = np.array([[0.2]])
     p = Point(point)
-    expected_centroid = np.array([0.2])
-    assert (p.centroid == expected_centroid).all() and p.centroid.shape == (1,)
+    # expected_centroid = np.array([0.2])
+    expected_centroid = np.array([])
+    assert (p.centroid == expected_centroid).all() and p.centroid.shape == (0,)
 
 
 def test_point_volume():

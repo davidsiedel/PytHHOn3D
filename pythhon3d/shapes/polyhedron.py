@@ -19,7 +19,7 @@ class Polyhedron(Domain):
             simplicial_sub_domains = Polyhedron.get_polyhedron_simplicial_partition(
                 vertices, connectivity_matrix, barycenter
             )
-            print(simplicial_sub_domains)
+            # print(simplicial_sub_domains)
             volume = 0.0
             quadrature_nodes, quadrature_weights = [], []
             for simplicial_sub_domain in simplicial_sub_domains:
