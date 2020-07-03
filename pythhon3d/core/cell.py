@@ -27,35 +27,35 @@ class Cell(Domain):
         
         """
         cell_shape = Cell.get_cell_shape(vertices)
-        if face_shape == "SEGMENT":
+        if cell_shape == "SEGMENT":
             c = Segment(vertices, polynomial_order)
             centroid = c.centroid
             volume = c.volume
             quadrature_nodes = c.quadrature_nodes
             quadrature_weights = c.quadrature_weights
             del c
-        if face_shape == "TRIANGLE":
+        if cell_shape == "TRIANGLE":
             c = Triangle(vertices, polynomial_order)
             centroid = c.centroid
             volume = c.volume
             quadrature_nodes = c.quadrature_nodes
             quadrature_weights = c.quadrature_weights
             del c
-        if face_shape == "POLYGON":
+        if cell_shape == "POLYGON":
             c = Polygon(vertices, polynomial_order)
             centroid = c.centroid
             volume = c.volume
             quadrature_nodes = c.quadrature_nodes
             quadrature_weights = c.quadrature_weights
             del c
-        if face_shape == "TETRAHEDRON":
+        if cell_shape == "TETRAHEDRON":
             c = Tetrahedron(vertices, polynomial_order)
             centroid = c.centroid
             volume = c.volume
             quadrature_nodes = c.quadrature_nodes
             quadrature_weights = c.quadrature_weights
             del c
-        if face_shape == "POLYHEDRON":
+        if cell_shape == "POLYHEDRON":
             c = Polyhedron(vertices, connectivity_matrix, polynomial_order)
             centroid = c.centroid
             volume = c.volume

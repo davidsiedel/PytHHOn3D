@@ -234,8 +234,21 @@ class Face(Domain):
         """
         p = reference_frame_transformation_matrix
         problem_dimension = p.shape[1]
-        if problem_dimension == 1 or problem_dimension == 2:
-            cols = [0]
-        if problem_dimension == 3:
-            cols = [0, 1]
-        return ((p @ points_matrix.T).T)[:, cols]
+        # --------------------------------------------------------------------------------------------------------------
+        # Reading the shape of points_matrix : if it is a list of points (i.e. a matrix), is_list is 1, otherwise (if
+        # points_matrix is a vector) is_list is 0
+        # --------------------------------------------------------------------------------------------------------------
+        is_list = len(points_matrix.shape) - 1
+        if is_list:
+            if problem_dimension == 1 or problem_dimension == 2:
+                cols = [0]
+            if problem_dimension == 3:
+                cols = [0, 1]
+            return ((p @ points_matrix.T).T)[:, cols]
+        else:
+            if problem_dimension == 1:
+                return (p @ points_matrix.T).T
+            if problem_dimension == 2:
+                return ((p @ points_matrix.T).T)[:-1]
+            if problem_dimension == 3:
+                return ((p @ points_matrix.T).T)[:-1]

@@ -8,7 +8,7 @@ from typing import List
 from numpy import ndarray as Mat
 
 
-class Element:
+class Operator:
     """
     ====================================================================================================================
     Class :
@@ -30,97 +30,22 @@ class Element:
         faces: List[Face],
         cell_basis: Basis,
         face_basis: Basis,
-        direction: int,
         derivative_direction: int,
+        faces_reference_frames_transformation_matrix: List[Mat],
     ):
-        b_faces = []
-        # --------------------------------------------------------------------------------------------------------------
-        for face in faces:
-            # ----------------------------------------------------------------------------------------------------------
-            # Getting the face orientation with respect to the cell
-            # ----------------------------------------------------------------------------------------------------------
-            vector_to_face = self.get_vector_to_face(cell, face)
-            if vector_to_face[-1] > 0:
-                n = -1
-                self.passmat = self.get_swaped_face_reference_frame_transformation_matrix(cell, face)
-            else:
-                n = 1
-                self.passmat = face.reference_frame_transformation_matrix
-            # ----------------------------------------------------------------------------------------------------------
-            # Computing the reconstructed gradient operator matrix
-            # ----------------------------------------------------------------------------------------------------------
-            m_cell_mass_left = self.get_cell_mass_matrix_in_cell(cell, cell_basis)
-            m_cell_advc_right = self.get_cell_advection_matrix_in_cell(cell, cell_basis, derivative_direction)
-            m_cell_mass_right = self.get_cell_mass_matrix_in_face(cell, face, cell_basis)
-            m_hybr_mass_right = self.get_hybrid_mass_matrix_in_face(cell, face, cell_basis, face_basis)
-            # ----------------------------------------------------------------------------------------------------------
-            b_cell = m_cell_advc_right - m_cell_mass_right
-            # ----------------------------------------------------------------------------------------------------------
-            face_normal_vector = self.passmat[-1]
-            b_face = m_hybr_mass_right * face_normal_vector[direction]
-            b_faces.append(b_face)
-        # --------------------------------------------------------------------------------------------------------------
-        b_faces = np.concatenate(b_faces, axis=1)
-        b_left = np.concatenate((b_cell, b_faces), axis=1)
-        print("m_cell_mass_left : \n{}".format(m_cell_mass_left))
-        reconstructed_gradient_operator = np.linalg.inv(m_cell_mass_left) @ b_left
-        # --------------------------------------------------------------------------------------------------------------
-        # Computing the stabilization operator matrix
-        # --------------------------------------------------------------------------------------------------------------
-        print("reconstructed_gradient_operator : \n{}".format(reconstructed_gradient_operator))
+        self.cell_mass_matrix_in_cell = self.get_cell_mass_matrix_in_cell(cell, cell_basis)
+        self.cell_mass_matrix_in_face = self.get_cell_mass_matrix_in_face(cell, face, cell_basis)
+        self.cell_advection_matrix_in_cell = self.get_cell_advection_matrix_in_cell(
+            cell, cell_basis, derivative_direction
+        )
+        self.hybrid_mass_matrix_in_face = self.get_hybrid_mass_matrix_in_face(cell, face, cell_basis, face_basis)
 
-    def get_vector_to_face(self, cell: Cell, face: Face) -> Mat:
-        """
-        ================================================================================================================
-        Description :
-        ================================================================================================================
-        
-        ================================================================================================================
-        Parameters :
-        ================================================================================================================
-        
-        ================================================================================================================
-        Exemple :
-        ================================================================================================================
-        
-        """
-        p = face.reference_frame_transformation_matrix
-        vector_to_face = (p @ (cell.centroid - face.centroid).T).T
-        return vector_to_face
-
-    def get_swaped_face_reference_frame_transformation_matrix(self, cell: Cell, face: Face) -> Mat:
-        """
-        ================================================================================================================
-        Description :
-        ================================================================================================================
-        
-        ================================================================================================================
-        Parameters :
-        ================================================================================================================
-        
-        ================================================================================================================
-        Exemple :
-        ================================================================================================================
-        
-        """
-        p = face.reference_frame_transformation_matrix
-        problem_dimension = p.shape[1]
-        # --------------------------------------------------------------------------------------------------------------
-        # 2d faces in 3d cells
-        # --------------------------------------------------------------------------------------------------------------
-        if problem_dimension == 3:
-            swaped_reference_frame_transformation_matrix = np.array([p[1], p[0], -p[2]])
-        # --------------------------------------------------------------------------------------------------------------
-        # 1d faces in 2d cells
-        # --------------------------------------------------------------------------------------------------------------
-        if problem_dimension == 2:
-            swaped_reference_frame_transformation_matrix = np.array([-p[0], -p[1]])
-        # --------------------------------------------------------------------------------------------------------------
-        # 0d faces in 1d cells
-        # --------------------------------------------------------------------------------------------------------------
-        if problem_dimension == 1:
-            swaped_reference_frame_transformation_matrix = p
-        return swaped_reference_frame_transformation_matrix
+        self.cell = cell
+        self.faces = faces
+        self.cell_basis = cell_basis
+        self.face_basis = face_basis
+        self.derivative_direction = derivative_direction
+        self.faces_reference_frames_transformation_matrix = faces_reference_frames_transformation_matrix
 
     def get_cell_mass_matrix_in_cell(self, cell: Cell, cell_basis: Basis) -> Mat:
         """

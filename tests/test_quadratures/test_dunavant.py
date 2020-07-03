@@ -7,6 +7,7 @@ from quadratures.dunavant import DunavantRule
 polynomial_orders = [1, 2, 3, 4, 5]
 
 functions_segment = [
+    (lambda x: 0.0 * x ** 1 + 3.0),
     (lambda x: 2.0 * x ** 1 + 3.0),
     (lambda x: 1.0 * x ** 2 + 6.0 * x ** 1 - 2.0),
     (lambda x: 4.0 * x ** 3 - 4.0 * x ** 2 + 5.0 * x ** 1 - 1.0),
