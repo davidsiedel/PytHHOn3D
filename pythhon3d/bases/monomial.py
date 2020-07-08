@@ -37,10 +37,10 @@ class ScaledMonomial(Basis):
         super().__init__(polynomial_order, domain_dimension)
         # self.basis_dimension = int(binom(polynomial_order + domain_dimension, polynomial_order,))
         self.exponents = self.get_exponents(polynomial_order, domain_dimension,)
-        self.gradient_operators = []
+        self.global_gradients = []
         for dx in range(domain_dimension):
             grad_dx = self.get_gradient_operator(polynomial_order, domain_dimension, dx)
-            self.gradient_operators.append(grad_dx)
+            self.global_gradients.append(grad_dx)
 
     def get_exponents(self, polynomial_order: int, domain_dimension: int) -> Mat:
         """
@@ -203,7 +203,7 @@ class ScaledMonomial(Basis):
         Or equivalently :
         d_phi_vector = (1/volume) @ gradient_operator @ phi_vector
         """
-        grad_dx = self.gradient_operators[dx]
+        grad_dx = self.global_gradients[dx]
         phi_vector = self.get_phi_vector(point, centroid, volume)
         d_phi_vector = (1.0 / volume) * (grad_dx @ phi_vector.T)
         return d_phi_vector

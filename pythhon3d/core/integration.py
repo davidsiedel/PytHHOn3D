@@ -8,21 +8,21 @@ from typing import List
 from numpy import ndarray as Mat
 
 
-class Operators:
+class Integration:
     def __init__(self):
         """
         ================================================================================================================
         Class :
         ================================================================================================================
-        
+        The Integration class provides methods to compute integration matrices that are then used to define elements.
         ================================================================================================================
         Parameters :
         ================================================================================================================
-        
+        All methods are static, so no parameters are needed.
         ================================================================================================================
         Attributes :
         ================================================================================================================
-        
+        All methods are static, so no attributes are created.
         """
 
     @staticmethod
@@ -31,15 +31,19 @@ class Operators:
         ================================================================================================================
         Description :
         ================================================================================================================
-        
+        Returns the mass matrix in a cell-like domain using quadrature points and weights
         ================================================================================================================
         Parameters :
         ================================================================================================================
-        
+        - cell : the considered cell
+        - cell_basis : the polynomial basis of the cell
         ================================================================================================================
         Exemple :
         ================================================================================================================
-        
+        Let linear polynomials in a one dimensional cell C. The mass matrix is then the sum for all quadrature points
+        x_Q and quadrature weights w_Q of the following matricial contribution:
+        w_Q*| 1*1    x_Q*1  |
+            | 1*x_Q x_Q*x_Q |
         """
         v_c = cell.volume
         x_c = cell.centroid
@@ -62,15 +66,19 @@ class Operators:
         ================================================================================================================
         Description :
         ================================================================================================================
-        
+        Returns the mass matrix in a cell-like domain using quadrature points and weights
         ================================================================================================================
         Parameters :
         ================================================================================================================
-        
+        - cell : the considered cell
+        - cell_basis : the polynomial basis of the cell
         ================================================================================================================
         Exemple :
         ================================================================================================================
-        
+        Let linear polynomials in a one dimensional cell C. The mass matrix is then the sum for all quadrature points
+        x_Q and quadrature weights w_Q of the following matricial contribution:
+        w_Q*| 0*0 1*0 |
+            | 0*1 1*1 |
         """
         v_c = cell.volume
         x_c = cell.centroid
@@ -177,7 +185,6 @@ class Operators:
         # --------------------------------------------------------------------------------------------------------------
         hybrid_mass_matrix_in_face = np.zeros((cell_basis.basis_dimension, face_basis.basis_dimension))
         # --------------------------------------------------------------------------------------------------------------
-        # print(face_reference_frame_transformation_matrix)
         x_f_in_face = Face.get_points_in_face_reference_frame(face.centroid, face_reference_frame_transformation_matrix)
         face_quadrature_nodes_in_face = Face.get_points_in_face_reference_frame(
             face.quadrature_nodes, face_reference_frame_transformation_matrix
