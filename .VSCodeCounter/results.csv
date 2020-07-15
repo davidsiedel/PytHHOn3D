@@ -12,7 +12,7 @@
 "/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/__init__.py", "Python", 0, 0, 0, 0, 1, 1
 "/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/assembly.py", "Python", 9, 0, 0, 3, 5, 17
 "/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/boundary.py", "Python", 13, 0, 0, 3, 3, 19
-"/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/cell.py", "Python", 70, 0, 0, 142, 18, 230
+"/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/cell.py", "Python", 70, 0, 0, 28, 6, 104
 "/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/element.py", "Python", 15, 0, 0, 14, 4, 33
 "/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/face.py", "Python", 115, 0, 0, 130, 10, 255
 "/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/integration.py", "Python", 100, 0, 0, 133, 10, 243
@@ -25,7 +25,7 @@
 "/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/quadratures/__init__.py", "Python", 0, 0, 0, 0, 1, 1
 "/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/quadratures/dunavant.py", "Python", 232, 0, 0, 110, 7, 349
 "/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/shapes/__init__.py", "Python", 0, 0, 0, 0, 1, 1
-"/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/shapes/domain.py", "Python", 18, 0, 0, 60, 5, 83
+"/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/shapes/domain.py", "Python", 18, 0, 0, 28, 4, 50
 "/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/shapes/point.py", "Python", 13, 0, 0, 15, 3, 31
 "/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/shapes/polygon.py", "Python", 66, 0, 0, 80, 7, 153
 "/Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/shapes/polyhedron.py", "Python", 45, 0, 0, 31, 5, 81
@@ -49,4 +49,4 @@
 "/Users/davidsiedel/Projects/PytHHOn3D/tests/test_shapes/test_segment.py", "Python", 40, 0, 0, 34, 16, 90
 "/Users/davidsiedel/Projects/PytHHOn3D/tests/test_shapes/test_tetrahedron.py", "Python", 63, 0, 0, 0, 11, 74
 "/Users/davidsiedel/Projects/PytHHOn3D/tests/test_shapes/test_triangle.py", "Python", 39, 0, 0, 1, 11, 51
-"Total", "-", 1830, 705, 0, 1355, 386, 4276
+"Total", "-", 1830, 705, 0, 1209, 373, 4117

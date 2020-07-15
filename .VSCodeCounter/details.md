@@ -1,10 +1,10 @@
 # Details
 
-Date : 2020-07-08 15:33:39
+Date : 2020-07-08 16:34:31
 
 Directory /Users/davidsiedel/Projects/PytHHOn3D
 
-Total : 50 files,  2535 codes, 1355 comments, 386 blanks, all 4276 lines
+Total : 50 files,  2535 codes, 1209 comments, 373 blanks, all 4117 lines
 
 [summary](results.md)
 
@@ -24,7 +24,7 @@ Total : 50 files,  2535 codes, 1355 comments, 386 blanks, all 4276 lines
 | [pythhon3d/core/__init__.py](/pythhon3d/core/__init__.py) | Python | 0 | 0 | 1 | 1 |
 | [pythhon3d/core/assembly.py](/pythhon3d/core/assembly.py) | Python | 9 | 3 | 5 | 17 |
 | [pythhon3d/core/boundary.py](/pythhon3d/core/boundary.py) | Python | 13 | 3 | 3 | 19 |
-| [pythhon3d/core/cell.py](/pythhon3d/core/cell.py) | Python | 70 | 142 | 18 | 230 |
+| [pythhon3d/core/cell.py](/pythhon3d/core/cell.py) | Python | 70 | 28 | 6 | 104 |
 | [pythhon3d/core/element.py](/pythhon3d/core/element.py) | Python | 15 | 14 | 4 | 33 |
 | [pythhon3d/core/face.py](/pythhon3d/core/face.py) | Python | 115 | 130 | 10 | 255 |
 | [pythhon3d/core/integration.py](/pythhon3d/core/integration.py) | Python | 100 | 133 | 10 | 243 |
@@ -37,7 +37,7 @@ Total : 50 files,  2535 codes, 1355 comments, 386 blanks, all 4276 lines
 | [pythhon3d/quadratures/__init__.py](/pythhon3d/quadratures/__init__.py) | Python | 0 | 0 | 1 | 1 |
 | [pythhon3d/quadratures/dunavant.py](/pythhon3d/quadratures/dunavant.py) | Python | 232 | 110 | 7 | 349 |
 | [pythhon3d/shapes/__init__.py](/pythhon3d/shapes/__init__.py) | Python | 0 | 0 | 1 | 1 |
-| [pythhon3d/shapes/domain.py](/pythhon3d/shapes/domain.py) | Python | 18 | 60 | 5 | 83 |
+| [pythhon3d/shapes/domain.py](/pythhon3d/shapes/domain.py) | Python | 18 | 28 | 4 | 50 |
 | [pythhon3d/shapes/point.py](/pythhon3d/shapes/point.py) | Python | 13 | 15 | 3 | 31 |
 | [pythhon3d/shapes/polygon.py](/pythhon3d/shapes/polygon.py) | Python | 66 | 80 | 7 | 153 |
 | [pythhon3d/shapes/polyhedron.py](/pythhon3d/shapes/polyhedron.py) | Python | 45 | 31 | 5 | 81 |

@@ -20,7 +20,7 @@ class Operator:
         ================================================================================================================
         Class :
         ================================================================================================================
-        The Element class provides general a framework to build an non-confromal element. It is built using both the
+        The Operator class provides general a framework to build an non-confromal element. It is built using both the
         local gradient operator and the stabilization operator that are used in non-conformal methods to define the local equilibrium of a cell.
         The local gradient is used in place of the regular gradient operator (see e.g. the Basis class) to write a
         behavior law.

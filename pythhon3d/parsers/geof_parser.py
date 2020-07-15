@@ -1,10 +1,12 @@
 import numpy as np
 
+C_c1d2 = np.array([[0], [1]])
 C_c2d3 = np.array([[0, 1], [1, 2], [2, 0]])
 C_c2d4 = np.array([[0, 1], [1, 2], [2, 3], [3, 0]])
 C_c3d4 = np.array([[0, 2, 1], [0, 3, 2], [0, 1, 3]])
 
 C_cf_ref = {
+    "c1d2": C_c1d2,
     "c2d3": C_c2d3,
     "c2d4": C_c2d4,
     "c3d4": C_c3d4,
@@ -74,7 +76,7 @@ def parse_geof_file(geof_file_path):
                             start_point = 1
                         else:
                             start_point = 0
-                        nodes = [int(item.replace("\n", "")) for item in c[i].split(" ")[start_point:]]
+                        nodes = [int(item.replace("\n", "")) - 1 for item in c[i].split(" ")[start_point:]]
                         Nset_nodes += nodes
                     else:
                         Nsets[Nset_name] = Nset_nodes
@@ -172,11 +174,12 @@ def parse_geof_file(geof_file_path):
                 else:
                     cell_face_connectivity_matrix.append(tags.index(tag))
             cells_faces_connectivity_matrix.append(cell_face_connectivity_matrix)
-        print("vertices : {}".format(vertices))
-        print("cells_vertices_connectivity_matrix : {}".format(cells_vertices_connectivity_matrix))
-        print("faces_vertices_connectivity_matrix : {}".format(faces_vertices_connectivity_matrix))
-        print("cells_faces_connectivity_matrix : {}".format(cells_faces_connectivity_matrix))
-        print("Nsets : {}".format(Nsets))
+        print("problem_dimension :\n {}\n".format(problem_dimension))
+        print("vertices :\n {}\n".format(vertices))
+        print("cells_vertices_connectivity_matrix :\n {}\n".format(cells_vertices_connectivity_matrix))
+        print("faces_vertices_connectivity_matrix :\n {}\n".format(faces_vertices_connectivity_matrix))
+        print("cells_faces_connectivity_matrix :\n {}\n".format(cells_faces_connectivity_matrix))
+        print("Nsets :\n {}\n".format(Nsets))
         # return N, C_nc, C_nf, C_cf, weights, Nsets, flags
         return (
             problem_dimension,
