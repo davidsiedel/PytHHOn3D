@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import ndarray as Mat
 from typing import List
+from typing import Callable
 
 from shapes.domain import Domain
 
@@ -11,7 +12,9 @@ from shapes.polygon import Polygon
 
 
 class Face(Domain):
-    def __init__(self, vertices: Mat, polynomial_order: int):
+    def __init__(
+        self, vertices: Mat, polynomial_order: int, displacement: List[Callable] = None, pressure: List[Callable] = None
+    ):
         """
         ================================================================================================================
         Class :
@@ -29,6 +32,14 @@ class Face(Domain):
         en dim 2 : [[p0x, p0y], [p1x, p1y]]
         en dim 3 : [[p0x, p0y, p0z], [p1x, p1y, p1z], [p2x, p2y, p2z]]
         """
+        # --------------------------------------------------------------------------------------------------------------
+        # Initilaizing boundary conditions
+        # --------------------------------------------------------------------------------------------------------------
+        self.displacement = displacement
+        self.pressure = pressure
+        # --------------------------------------------------------------------------------------------------------------
+        # Building the face
+        # --------------------------------------------------------------------------------------------------------------
         face_shape = Face.get_face_shape(vertices)
         # --------------------------------------------------------------------------------------------------------------
         # Computing the mapping from the cell reference frame into the face hyperplane

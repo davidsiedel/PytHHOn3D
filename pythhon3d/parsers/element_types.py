@@ -1,0 +1,13 @@
+import numpy as np
+
+C_c1d2 = np.array([[0], [1]])
+C_c2d3 = np.array([[0, 1], [1, 2], [2, 0]])
+C_c2d4 = np.array([[0, 1], [1, 2], [2, 3], [3, 0]])
+C_c3d4 = np.array([[0, 2, 1], [0, 3, 2], [0, 1, 3]])
+
+C_cf_ref = {
+    "c1d2": C_c1d2,
+    "c2d3": C_c2d3,
+    "c2d4": C_c2d4,
+    "c3d4": C_c3d4,
+}

@@ -1,16 +1,6 @@
 import numpy as np
 
-C_c1d2 = np.array([[0], [1]])
-C_c2d3 = np.array([[0, 1], [1, 2], [2, 0]])
-C_c2d4 = np.array([[0, 1], [1, 2], [2, 3], [3, 0]])
-C_c3d4 = np.array([[0, 2, 1], [0, 3, 2], [0, 1, 3]])
-
-C_cf_ref = {
-    "c1d2": C_c1d2,
-    "c2d3": C_c2d3,
-    "c2d4": C_c2d4,
-    "c3d4": C_c3d4,
-}
+from parsers.element_types import C_cf_ref
 
 
 def parse_geof_file(geof_file_path):
@@ -56,13 +46,13 @@ def parse_geof_file(geof_file_path):
         # ==============================================================================================================
         # --------------------------------------------------------------------------------------------------------------
         # skipping the extraction of the cells connectivity matrix to extract
-        # directly the Nsets matrices. By doing so, it is easier when defining
+        # directly the nsets matrices. By doing so, it is easier when defining
         # faces afterward to check whether they belong to a Nset or not. hence,
-        # one defines a temporary line increment for the reading of Nsets
+        # one defines a temporary line increment for the reading of nsets
         # related lines.
         # --------------------------------------------------------------------------------------------------------------
         i_line_nsets = i_line + N_cells + 2
-        Nsets = {}
+        nsets = {}
         for i in range(i_line_nsets, len(c)):
             if "**liset" in c[i] or "**elset" in c[i]:
                 break
@@ -79,9 +69,9 @@ def parse_geof_file(geof_file_path):
                         nodes = [int(item.replace("\n", "")) - 1 for item in c[i].split(" ")[start_point:]]
                         Nset_nodes += nodes
                     else:
-                        Nsets[Nset_name] = Nset_nodes
+                        nsets[Nset_name] = Nset_nodes
                         break
-            Nsets[Nset_name] = Nset_nodes
+            nsets[Nset_name] = Nset_nodes
         # ==============================================================================================================
         # EXTRACTING THE CELLS CONNECTIVITY MATRIX
         # ==============================================================================================================
@@ -95,11 +85,13 @@ def parse_geof_file(geof_file_path):
         # contains either c2d3 and c2d4 elements for instance. If so, the cells
         # connectivity matrix does not have a homogeneous number of columns.
         # --------------------------------------------------------------------------------------------------------------
-        cells_type_matrix = []
+        cells_types = []
+        cells_connectivity_matrix = []
         cells_vertices_connectivity_matrix = []
         for i in range(i_line, i_line + N_cells):
             element_type = str(c[i].split(" ")[1])
-            cells_type_matrix.append(element_type)
+            cells_types.append(element_type)
+            cells_connectivity_matrix.append(C_cf_ref[element_type])
             cell_vertices = [int(c[i].split(" ")[j]) - 1 for j in range(2, len(c[i].split(" ")))]
             cells_vertices_connectivity_matrix.append(cell_vertices)
         # --------------------------------------------------------------------------------------------------------------
@@ -109,12 +101,12 @@ def parse_geof_file(geof_file_path):
         # - a tags list that stores a serial ID for each face, in order not to
         #  add the same face twice in the face connectivity matrix.
         # - a flags vector (with size the number fo faces in the mesh) to store
-        # the Nsets each face belongs to.
+        # the nsets each face belongs to.
         # - a weights vector with the weight of each node (the number of cells
         # it belongs to)
         # --------------------------------------------------------------------------------------------------------------
         cell_types = []
-        for cell_type in cells_type_matrix:
+        for cell_type in cells_types:
             if not cell_type in cell_types:
                 cell_types.append(cell_type)
 
@@ -130,7 +122,7 @@ def parse_geof_file(geof_file_path):
             for vertex_index in cells_vertices_connectivity_matrix[i]:
                 weights[vertex_index] += 1
             cell_face_connectivity_matrix = []
-            cell_type = cells_type_matrix[i]
+            cell_type = cells_types[i]
             # ----------------------------------------------------------------------------------------------------------
             # For each face in the ith cell :
             # ----------------------------------------------------------------------------------------------------------
@@ -154,14 +146,14 @@ def parse_geof_file(geof_file_path):
                     tags.append(tag)
                     cell_face_connectivity_matrix.append(len(tags) - 1)
                     # --------------------------------------------------------------------------------------------------
-                    # For all Nsets, check whether the face belongs to it or
+                    # For all nsets, check whether the face belongs to it or
                     # not. If it belongs to any Nset, append flag with the name
                     # of the Nset, and append "NONE" otherwise.
                     # --------------------------------------------------------------------------------------------------
-                    for key in Nsets.keys():
+                    for key in nsets.keys():
                         count = 0
                         for vertex_index in face_vertices_connectivity_matrix:
-                            if vertex_index in Nsets[key]:
+                            if vertex_index in nsets[key]:
                                 count += 1
                         if count == len(face_vertices_connectivity_matrix):
                             flags_local.append(key)
@@ -179,13 +171,14 @@ def parse_geof_file(geof_file_path):
         print("cells_vertices_connectivity_matrix :\n {}\n".format(cells_vertices_connectivity_matrix))
         print("faces_vertices_connectivity_matrix :\n {}\n".format(faces_vertices_connectivity_matrix))
         print("cells_faces_connectivity_matrix :\n {}\n".format(cells_faces_connectivity_matrix))
-        print("Nsets :\n {}\n".format(Nsets))
-        # return N, C_nc, C_nf, C_cf, weights, Nsets, flags
+        print("nsets :\n {}\n".format(nsets))
+        # return N, C_nc, C_nf, C_cf, weights, nsets, flags
         return (
             problem_dimension,
             vertices,
             cells_vertices_connectivity_matrix,
             faces_vertices_connectivity_matrix,
             cells_faces_connectivity_matrix,
-            Nsets,
+            cells_connectivity_matrix,
+            nsets,
         )

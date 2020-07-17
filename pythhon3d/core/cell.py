@@ -1,5 +1,7 @@
 import numpy as np
 from numpy import ndarray as Mat
+from typing import List
+from typing import Callable
 
 from shapes.domain import Domain
 
@@ -11,7 +13,7 @@ from shapes.polyhedron import Polyhedron
 
 
 class Cell(Domain):
-    def __init__(self, vertices: Mat, connectivity_matrix: Mat, polynomial_order: int):
+    def __init__(self, vertices: Mat, connectivity_matrix: Mat, polynomial_order: int, load: List[Callable] = None):
         """
         ================================================================================================================
         Class :
@@ -26,6 +28,13 @@ class Cell(Domain):
         ================================================================================================================
         
         """
+        # --------------------------------------------------------------------------------------------------------------
+        # Initilaizing the load
+        # --------------------------------------------------------------------------------------------------------------
+        self.load = load
+        # --------------------------------------------------------------------------------------------------------------
+        # Building the cell
+        # --------------------------------------------------------------------------------------------------------------
         cell_shape = Cell.get_cell_shape(vertices)
         if cell_shape == "SEGMENT":
             c = Segment(vertices, polynomial_order)

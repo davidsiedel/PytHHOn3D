@@ -4,6 +4,8 @@ from core.integration import Integration
 from core.operators.operator import Operator
 from bases.basis import Basis
 from bases.monomial import ScaledMonomial
+from behaviors.behavior import Behavior
+from behaviors.laplacian import Laplacian
 
 import numpy as np
 from typing import List
@@ -12,7 +14,13 @@ from numpy import ndarray as Mat
 
 class HDG(Operator):
     def __init__(
-        self, cell: Cell, faces: List[Face], cell_basis: Basis, face_basis: Basis, problem_dimension: int,
+        self,
+        cell: Cell,
+        faces: List[Face],
+        cell_basis: Basis,
+        face_basis: Basis,
+        problem_dimension: int,
+        behavior: Behavior,
     ):
         """
         ================================================================================================================
@@ -39,12 +47,34 @@ class HDG(Operator):
         ================================================================================================================
         - local_gradient_operators : the local gradient operators Bj for the HDG element, where j denotes the derivative
         direction
-        - local_stabilization_operator : the local stabilization operator Z for the HDG element
+        - local_stabilization_matrix : the local stabilization operator Z for the HDG element
         """
+        # --------------------------------------------------------------------------------------------------------------
+        # LOAD
+        # --------------------------------------------------------------------------------------------------------------
+        if not cell.load is None:
+            local_load_vectors = []
+            for direction in range(field_dimension):
+                if not cell.load[direction] is None:
+                    load_vector = Integration.get_cell_load_vector_in_cell(cell, cell_basis, cell.load[direction])
+                else:
+                    load_vector = np.zeros((cell_basis.basis_dimension,))
+                local_load_vectors.append(load_vector)
+        else:
+            local_load_vectors = [np.zeros((cell_basis.basis_dimension,)) for i in range(field_dimension)]
+        # --------------------------------------------------------------------------------------------------------------
+        # OPERATORS
+        # --------------------------------------------------------------------------------------------------------------
         number_of_faces = len(faces)
         # --------------------------------------------------------------------------------------------------------------
-        local_stabilization_stiffness_operator = np.zeros((cell_basis.basis_dimension + face_basis.basis_dimension))
-        local_mechanical_stiffness_operators = []
+        local_stabilization_matrix = np.zeros(
+            (
+                cell_basis.basis_dimension + number_of_faces * face_basis.basis_dimension,
+                cell_basis.basis_dimension + number_of_faces * face_basis.basis_dimension,
+            )
+        )
+        local_reconstructed_gradient_operators = []
+        local_pressure_vectors = []
         # --------------------------------------------------------------------------------------------------------------
         z_cell = np.zeros((face_basis.basis_dimension, cell_basis.basis_dimension))
         z_faces = []
@@ -92,26 +122,102 @@ class HDG(Operator):
                         else:
                             z_face = np.zeros((face_basis.basis_dimension, face_basis.basis_dimension))
                         z_faces.append(z_face)
-                    zs = [z_cell] + z_faces
-                    z = np.concatenate(zs, axis=1)
+                    z = [z_cell] + z_faces
+                    z = np.concatenate(z, axis=1)
+                    local_stabilization_matrix += z.T @ (face_mass_matrix_in_face @ z)
                     # --------------------------------------------------------------------------------------------------
-                    local_stabilization_stiffness_operator += z.T @ face_mass_matrix_in_face @ z
+                    # local_stabilization_stiffness_operator += z.T @ face_mass_matrix_in_face @ z
+                    # --------------------------------------------------------------------------------------------------
+                # ------------------------------------------------------------------------------------------------------
+                # PRESSURE
+                # ------------------------------------------------------------------------------------------------------
+                if not face.pressure is None:
+                    for direction in range(field_dimension):
+                        if not face.pressure[direction] is None:
+                            pressure_vector = Integration.get_face_pressure_vector_in_face(
+                                face, face_basis, passmat, face.pressure[direction]
+                            )
+                        else:
+                            pressure_vector = np.zeros((face_basis.basis_dimension,))
+                        local_pressure_vectors.append(pressure_vector)
+                else:
+                    local_pressure_vectors += [np.zeros((face_basis.basis_dimension,)) for i in range(field_dimension)]
+                # local_pressure_vectors.append(face_pressure_vectors)
+                # ------------------------------------------------------------------------------------------------------
+                # DISPLACEMENT
+                # ------------------------------------------------------------------------------------------------------
+                if not face.displacement is None:
+                    displacement_vectors = []
+                    for direction in range(field_dimension):
+                        if not face.displacement[direction] is None:
+                            displacement_vector = Integration.get_face_displacement_vector_in_face(
+                                face, face_basis, passmat, face.displacement[direction]
+                            )
+                        else:
+                            displacement_vector = np.zeros((face_basis.basis_dimension,))
+                        displacement_vectors.append(displacement_vector)
+                else:
+                    displacement_vectors = [np.zeros((face_basis.basis_dimension,)) for i in range(field_dimension)]
             # ----------------------------------------------------------------------------------------------------------
-            b_rights = [b_cell] + b_faces
-            b_right = np.concatenate(b_rights, axis=1)
-            b = np.linalg.inv(m_cell_mass_left) @ b_right
-            local_mechanical_stiffness_operator = b.T @ m_cell_mass_left @ b
-            local_mechanical_stiffness_operators.append(local_mechanical_stiffness_operator)
+            b_right = [b_cell] + b_faces
+            b_right = np.concatenate(b_right, axis=1)
+            local_reconstructed_gradient_operator = np.linalg.inv(m_cell_mass_left) @ b_right
+            # local_mechanical_stiffness_operator = b.T @ m_cell_mass_left @ b
+            # local_reconstructed_gradient_operators.append(local_mechanical_stiffness_operator)
+            local_reconstructed_gradient_operators.append(local_reconstructed_gradient_operator)
         # --------------------------------------------------------------------------------------------------------------
         # local mass opertor
         # --------------------------------------------------------------------------------------------------------------
-        a = np.eye(cell_basis.basis_dimension)
-        a2 = np.zeros((cell_basis.basis_dimension, number_of_faces * face_basis.basis_dimension))
-        a3 = np.concatenate((a, a2), axis=1)
-        local_mechanical_mass_operator = a3.T @ m_cell_mass_left @ a3
+        i_cell = np.eye(cell_basis.basis_dimension)
+        i_face = np.zeros((cell_basis.basis_dimension, number_of_faces * face_basis.basis_dimension))
+        local_identity_operator = np.concatenate((i_cell, i_face), axis=1)
+        # local_mechanical_mass_operator = a3.T @ m_cell_mass_left @ a3
         # --------------------------------------------------------------------------------------------------------------
         # Building the HDG Operator
         # --------------------------------------------------------------------------------------------------------------
+        b_vector = local_load_vectors + local_pressure_vectors
+        b_vector = np.concatenate(b_vector)
         super().__init__(
-            local_mechanical_mass_operator, local_mechanical_stiffness_operators, local_stabilization_stiffness_operator
+            m_cell_mass_left,
+            # face_mass_matrix_in_face,
+            local_identity_operator,
+            local_reconstructed_gradient_operators,
+            local_stabilization_matrix,
+            local_load_vectors,
+            local_pressure_vectors,
         )
+
+    def get_face_discontinuous_gradient_component(self, derivative_direction: int, face: Face):
+        """
+        ================================================================================================================
+        Description :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Parameters :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Exemple :
+        ================================================================================================================
+    
+        """
+        return
+
+    def get_global_discontinuous_gradient_operator(self):
+        """
+        ================================================================================================================
+        Description :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Parameters :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Exemple :
+        ================================================================================================================
+    
+        """
+        return
+

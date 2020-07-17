@@ -1,6 +1,6 @@
-# from core.face import Face
-# from core.cell import Cell
-# from core.operators import Operators
+from core.face import Face
+from core.cell import Cell
+
 # from bases.basis import Basis
 # from bases.monomial import ScaledMonomial
 
@@ -12,9 +12,13 @@ from numpy import ndarray as Mat
 class Operator:
     def __init__(
         self,
-        local_mechanical_mass_operator: Mat,
-        local_mechanical_stiffness_operators: List[Mat],
-        local_stabilization_stiffness_operator: Mat,
+        local_cell_mass_matrix: Mat,
+        # local_face_mass_matrix: Mat,
+        local_identity_operator: Mat,
+        local_reconstructed_gradient_operators: List[Mat],
+        local_stabilization_matrix: Mat,
+        local_load_vectors: Mat,
+        local_pressure_vectors: Mat,
     ):
         """
         ================================================================================================================
@@ -30,16 +34,20 @@ class Operator:
         Parameters :
         ================================================================================================================
         - local_gradient_operators : the local gradient operator for the given element
-        - local_stabilization_operator : the local stabilization operator for the given element
+        - local_stabilization_matrix : the local stabilization operator for the given element
         ================================================================================================================
         Attributes :
         ================================================================================================================
         - local_gradient_operators : the local gradient operator for the given element
-        - local_stabilization_operator : the local stabilization operator for the given element
+        - local_stabilization_matrix : the local stabilization operator for the given element
         """
-        self.local_mechanical_mass_operator = local_mechanical_mass_operator
-        self.local_mechanical_stiffness_operators = local_mechanical_stiffness_operators
-        self.local_stabilization_stiffness_operator = local_stabilization_stiffness_operator
+        self.local_cell_mass_matrix = local_cell_mass_matrix
+        # self.local_face_mass_matrix = local_face_mass_matrix
+        self.local_identity_operator = local_identity_operator
+        self.local_reconstructed_gradient_operators = local_reconstructed_gradient_operators
+        self.local_stabilization_matrix = local_stabilization_matrix
+        self.local_load_vectors = local_load_vectors
+        self.local_pressure_vectors = local_pressure_vectors
 
     def get_vector_to_face(self, cell: Cell, face: Face) -> Mat:
         """
