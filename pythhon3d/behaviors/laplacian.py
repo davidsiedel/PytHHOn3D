@@ -26,12 +26,10 @@ class Laplacian(Behavior):
         field_dimension = problem_dimension
         if problem_dimension == 1:
             tangent_matrix = np.array([[1.0]])
-            indices = [(0, 0)]
         if problem_dimension == 2:
             tangent_matrix = np.array(
                 [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
             )
-            indices = [(0, 0), (1, 1), (0, 1), (1, 0)]
         if problem_dimension == 2:
             tangent_matrix = np.array(
                 [
@@ -46,5 +44,4 @@ class Laplacian(Behavior):
                     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
                 ]
             )
-            indices = [(0, 0), (1, 1), (2, 2), (1, 2), (0, 2), (0, 1), (2, 1), (2, 0), (1, 0)]
-        super().__init__(problem_dimension, field_dimension, indices, tangent_matrix)
+        super().__init__(tangent_matrix)

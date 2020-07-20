@@ -9,6 +9,7 @@ from bases.basis import Basis
 from bases.monomial import ScaledMonomial
 from core.face import Face
 from core.cell import Cell
+from core.unknown import Unknown
 from core.operators.operator import Operator
 from core.operators.hdg import HDG
 from behaviors.behavior import Behavior
@@ -91,22 +92,25 @@ def build(
         cell = Cell(cell_vertices, cell_connectivity_matrix, integration_order)
         cells.append(cell)
     # ------------------------------------------------------------------------------------------------------------------
+    # Initilaizing Unknown and Behavior objects
+    # ------------------------------------------------------------------------------------------------------------------
+    unknown = Unknown(problem_dimension, problem_dimension)
+    laplacian = Laplacian(problem_dimension)
+    # ------------------------------------------------------------------------------------------------------------------
     # Initilaizing Elements objects
     # ------------------------------------------------------------------------------------------------------------------
     elements = []
     for i, cell in enumerate(cells):
         local_faces = [faces[j] for j in cells_faces_connectivity_matrix[i]]
-        op = get_operator(
-            operator_type, cell, local_faces, cell_basis, face_basis, problem_dimension, problem_dimension
-        )
+        op = get_operator(operator_type, cell, local_faces, cell_basis, face_basis, unknown, laplacian)
         # --------------------------------------------------------------------------------------------------------------
-        local_cell_mass_matrix = op.local_cell_mass_matrix
-        # local_face_mass_matrix = op.local_face_mass_matrix
-        local_identity_operator = op.local_identity_operator
-        local_reconstructed_gradient_operators = op.local_reconstructed_gradient_operators
-        local_stabilization_matrix = op.local_stabilization_matrix
-        local_load_vectors = op.local_load_vectors
-        local_pressure_vectors = op.local_pressure_vectors
+        # local_cell_mass_matrix = op.local_cell_mass_matrix
+        # # local_face_mass_matrix = op.local_face_mass_matrix
+        # local_identity_operator = op.local_identity_operator
+        # local_reconstructed_gradient_operators = op.local_reconstructed_gradient_operators
+        # local_stabilization_matrix = op.local_stabilization_matrix
+        # local_load_vectors = op.local_load_vectors
+        # local_pressure_vectors = op.local_pressure_vectors
         # --------------------------------------------------------------------------------------------------------------
         del op
         vertices = cells_vertices_connectivity_matrix[i]
@@ -140,8 +144,8 @@ def get_operator(
     faces: List[Face],
     cell_basis: Basis,
     face_basis: Basis,
-    problem_dimension: int,
-    field_dimension: int,
+    unknown: Unknown,
+    behavior: Behavior,
 ):
     """
         ================================================================================================================
@@ -157,7 +161,7 @@ def get_operator(
         ================================================================================================================
         """
     if operator_type == "HDG":
-        op = HDG(cell, faces, cell_basis, face_basis, problem_dimension, field_dimension)
+        op = HDG(cell, faces, cell_basis, face_basis, unknown, behavior)
     else:
         raise NameError("The specified operator does not exist")
     return op

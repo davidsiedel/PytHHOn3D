@@ -12,13 +12,16 @@ from numpy import ndarray as Mat
 class Operator:
     def __init__(
         self,
-        local_cell_mass_matrix: Mat,
-        # local_face_mass_matrix: Mat,
-        local_identity_operator: Mat,
-        local_reconstructed_gradient_operators: List[Mat],
+        # local_cell_mass_matrix: Mat,
+        # # local_face_mass_matrix: Mat,
+        # local_identity_operator: Mat,
+        # local_reconstructed_gradient_operators: List[Mat],
+        # local_stabilization_matrix: Mat,
+        # local_load_vectors: Mat,
+        # local_pressure_vectors: Mat,
+        local_gradient_opertor: Mat,
         local_stabilization_matrix: Mat,
-        local_load_vectors: Mat,
-        local_pressure_vectors: Mat,
+        local_mass_matrix: Mat,
     ):
         """
         ================================================================================================================
@@ -41,13 +44,17 @@ class Operator:
         - local_gradient_operators : the local gradient operator for the given element
         - local_stabilization_matrix : the local stabilization operator for the given element
         """
-        self.local_cell_mass_matrix = local_cell_mass_matrix
-        # self.local_face_mass_matrix = local_face_mass_matrix
-        self.local_identity_operator = local_identity_operator
-        self.local_reconstructed_gradient_operators = local_reconstructed_gradient_operators
-        self.local_stabilization_matrix = local_stabilization_matrix
-        self.local_load_vectors = local_load_vectors
-        self.local_pressure_vectors = local_pressure_vectors
+        self.local_gradient_opertor = local_b_operator
+        self.local_stabilization_matrix = k_z
+        self.local_mass_matrix = Integration.get_cell_mass_matrix_in_cell(cell, cell_basis)
+        #
+        # self.local_cell_mass_matrix = local_cell_mass_matrix
+        # # self.local_face_mass_matrix = local_face_mass_matrix
+        # self.local_identity_operator = local_identity_operator
+        # self.local_reconstructed_gradient_operators = local_reconstructed_gradient_operators
+        # self.local_stabilization_matrix = local_stabilization_matrix
+        # self.local_load_vectors = local_load_vectors
+        # self.local_pressure_vectors = local_pressure_vectors
 
     def get_vector_to_face(self, cell: Cell, face: Face) -> Mat:
         """
@@ -105,3 +112,26 @@ class Operator:
         if problem_dimension == 1:
             swaped_reference_frame_transformation_matrix = p
         return swaped_reference_frame_transformation_matrix
+
+    def get_face_passmat(self, cell: Cell, face: Face):
+        """
+        ================================================================================================================
+        Description :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Parameters :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Exemple :
+        ================================================================================================================
+        """
+        vector_to_face = self.get_vector_to_face(cell, face)
+        if vector_to_face[-1] > 0:
+            n = -1
+            passmat = self.get_swaped_face_reference_frame_transformation_matrix(cell, face)
+        else:
+            n = 1
+            passmat = face.reference_frame_transformation_matrix
+        return passmat
