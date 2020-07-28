@@ -14,11 +14,11 @@ from behaviors.laplacian import Laplacian
 
 from pythhon3d import build, solve
 
-d = 1
+d = 2
 
 if d == 1:
     k_f = 1
-    k_c = 1
+    k_c = 2
     dimension = 1
     mesh_file = "/Users/davidsiedel/Projects/PytHHOn3D/meshes/c1d2.geof"
     # mesh_file = "/Users/davidsiedel/Projects/PytHHOn3D/meshes/test1D.geof"
@@ -27,25 +27,24 @@ if d == 1:
     operator_type = "HDG"
     pressure = [lambda x: 0.0]
     displacement = [lambda x: 0.0]
-    load = [lambda x: np.sin(x)]
-    # pressure = [lambda x: np.array([0.0])]
-    # displacement = [lambda x: np.array([0.0])]
-    # load = lambda x: [np.array([np.sin(x)])]
+    displacement_tip = [lambda x: 1.0]
+    load = [lambda x: np.sin(2.0 * np.pi * x[0])]
+    load = [lambda x: np.sin(1.0 * np.pi * x[0])]
+    # load = [lambda x: 0.0]
     boundary_conditions = {"RIGHT": (displacement, pressure), "LEFT": (displacement, pressure)}
+    # boundary_conditions = {"RIGHT": (displacement_tip, pressure), "LEFT": (displacement, pressure)}
 if d == 2:
     k_f = 1
     k_c = 1
     dimension = 2
     mesh_file = "/Users/davidsiedel/Projects/PytHHOn3D/meshes/c2d3.geof"
+    mesh_file = "/Users/davidsiedel/Projects/PytHHOn3D/meshes/triangles_test.geof"
     face_polynomial_order = k_f
     cell_polynomial_order = k_c
     operator_type = "HDG"
     pressure = [lambda x: 0.0, lambda x: 0.0]
     displacement = [lambda x: 0.0, lambda x: 0.0]
-    load = [lambda x: np.sin(x[0] * x[1]), lambda x: np.sin(x[0] * x[1])]
-    # pressure = [lambda x: np.array([0.0])]
-    # displacement = [lambda x: np.array([0.0])]
-    # load = lambda x: [np.array([np.sin(x)])]
+    load = [lambda x: np.sin(2.0 * np.pi * x[0] * x[1]), lambda x: np.sin(2.0 * np.pi * x[0] * x[1])]
     boundary_conditions = {
         "BOTTOM": (displacement, pressure),
         "TOP": (displacement, pressure),
@@ -63,13 +62,10 @@ if d == 3:
     pressure = [lambda x: 0.0, lambda x: 0.0, lambda x: 0.0]
     displacement = [lambda x: 0.0, lambda x: 0.0, lambda x: 0.0]
     load = [
-        lambda x: np.sin(x[0] * x[1] * x[2]),
-        lambda x: np.sin(x[0] * x[1] * x[2]),
-        lambda x: np.sin(x[0] * x[1] * x[2]),
+        lambda x: np.sin(2.0 * np.pi * x[0] * x[1] * x[2]),
+        lambda x: np.sin(2.0 * np.pi * x[0] * x[1] * x[2]),
+        lambda x: np.sin(2.0 * np.pi * x[0] * x[1] * x[2]),
     ]
-    # pressure = [lambda x: np.array([0.0])]
-    # displacement = [lambda x: np.array([0.0])]
-    # load = lambda x: [np.array([np.sin(x)])]
     boundary_conditions = {
         "BOTTOM": (displacement, pressure),
         "TOP": (displacement, pressure),
@@ -80,35 +76,11 @@ if d == 3:
     }
 
 if __name__ == "__main__":
-    # parser = argparse.ArgumentParser(description="Solve a mechanical system using the HHO method")
-    # parser.add_argument("-msh", "--mesh_file", help="shows output")
-    # parser.add_argument("-kf", "--face_polynomial_order", help="shows output")
-    # parser.add_argument("-kc", "--cell_polynomial_order", help="shows output")
-    # parser.add_argument("-op", "--operator_type", help="shows output")
-    # args = parser.parse_args()
-    # # ------------------------------------------------------------------------------------------------------------------
-    # mesh_file = args.mesh_file
-    # face_polynomial_order = int(args.face_polynomial_order)
-    # cell_polynomial_order = int(args.cell_polynomial_order)
-    # operator_type = args.operator_type
-    # # -----------------------------------------------------------------------------------------------------------------
-    # build(mesh_file, face_polynomial_order, cell_polynomial_order, operator_type, behavior, boundary_conditions, load)
-    # build(mesh_file, face_polynomial_order, cell_polynomial_order, operator_type)
     (
-        # vertices,
-        # elements,
-        # cells_faces_connectivity_matrix,
-        # cells_vertices_connectivity_matrix,
-        # faces_vertices_connectivity_matrix,
-        # nsets,
-        # cell_basis,
-        # face_basis,
-        # number_of_cells,
-        # number_of_faces,
-        # unknown,
         vertices,
-        elements,
         faces,
+        cells,
+        operators,
         cells_faces_connectivity_matrix,
         cells_vertices_connectivity_matrix,
         faces_vertices_connectivity_matrix,
@@ -118,17 +90,13 @@ if __name__ == "__main__":
         unknown,
     ) = build(mesh_file, face_polynomial_order, cell_polynomial_order, operator_type)
     # ------------------------------------------------------------------------------------------------------------------
-    tangent_matrices = [np.eye(d ** 2) for i in range(len(elements))]
-    # print(tangent_matrices[0])
+    tangent_matrices = [np.eye(d ** 2) for i in range(len(cells))]
     # ------------------------------------------------------------------------------------------------------------------
-    solve(
-        # elements,
-        # cells_faces_connectivity_matrix,
-        # cells_vertices_connectivity_matrix,
-        # faces_vertices_connectivity_matrix,
+    vertices, vertices_sols, global_solution = solve(
         vertices,
-        elements,
         faces,
+        cells,
+        operators,
         cells_faces_connectivity_matrix,
         cells_vertices_connectivity_matrix,
         faces_vertices_connectivity_matrix,
@@ -140,4 +108,11 @@ if __name__ == "__main__":
         boundary_conditions,
         load,
     )
+    import matplotlib.pyplot as plt
 
+    print(global_solution.shape)
+    plt.plot(vertices, global_solution[:100], label="HHO faces")
+    plt.plot(vertices, vertices_sols, label="HHO cell")
+    plt.plot(vertices, [((-2.0 * np.pi) ** 2) * load[0](x) for x in vertices], label="analytical")
+    plt.legend()
+    plt.show()

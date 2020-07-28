@@ -16,7 +16,6 @@ class Displacement:
         face: Face,
         face_basis: Basis,
         face_reference_frame_transformation_matrix: Mat,
-        # unknown: Unknown,
         displacement: List[Callable],
     ):
         """
@@ -37,21 +36,6 @@ class Displacement:
             face, face_basis, face_reference_frame_transformation_matrix, displacement
         )
         self.displacement_vector = displacement_vector
-
-    #     displacement_vector = np.zeros((face_basis.basis_dimension,))
-    #     for i, displacement_component in enumerate(displacement):
-    #         if displacement_component is None:
-    #             displacement_vector_component = np.zeros((face_basis.basis_dimension,))
-    #         else:
-    #             # face: Face, face_basis: Basis, face_reference_frame_transformation_matrix: Mat, displacement: Callable,
-    #             displacement_vector_component = Integration.get_face_pressure_vector_in_face(
-    #                 face, face_basis, face_reference_frame_transformation_matrix, displacement_component
-    #             )
-    #         displacement_vector[
-    #             i * face_basis.basis_dimension : (i + 1) * face_basis.basis_dimension
-    #         ] += displacement_vector_component
-
-    # self.displacement_vector = displacement_vector
 
     def check_displacement_consistency(self, displacement: List[Callable], unknown: Unknown):
         """

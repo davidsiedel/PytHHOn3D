@@ -125,9 +125,6 @@ class Integration:
             phi_vector = cell_basis.get_phi_vector(x_Q_f, x_c, v_c)
             number_of_components = phi_vector.shape[0]
             phi_vector = np.resize(phi_vector, (1, number_of_components))
-            # print("x_Q_f : \n{}".format(x_Q_f))
-            # print("w_Q_f : \n{}".format(w_Q_f))
-            # print("phi_vector : \n{}".format(phi_vector))
             # ----------------------------------------------------------------------------------------------------------
             m = w_Q_f * phi_vector.T @ phi_vector
             cell_mass_matrix_in_face += m
@@ -164,7 +161,6 @@ class Integration:
             d_phi_vector = cell_basis.get_d_phi_vector(x_Q_c, x_c, v_c, dx)
             number_of_components = d_phi_vector.shape[0]
             d_phi_vector = np.resize(d_phi_vector, (1, number_of_components))
-            # print("d_phi_vector : {}".format(d_phi_vector))
             # ----------------------------------------------------------------------------------------------------------
             m = w_Q_c * phi_vector.T @ d_phi_vector
             cell_advection_matrix_in_cell += m

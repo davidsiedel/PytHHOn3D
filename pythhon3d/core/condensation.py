@@ -59,7 +59,6 @@ class Condensation:
         # --------------------------------------------------------------------------------------------------------------
         m_cell_cell_inv = np.linalg.inv(m_cell_cell)
         # --------------------------------------------------------------------------------------------------------------
-        # return m_cell_cell_inv, m_cell_faces, v_cell
         return m_cell_cell_inv, m_cell_faces, m_faces_cell, m_faces_faces, v_cell, v_faces
 
     @staticmethod
@@ -80,7 +79,6 @@ class Condensation:
         ================================================================================================================
         
         """
-        # gd = m_faces_cell @ m_cell_cell_inv @ m_cell_faces
         ge = m_faces_cell @ m_cell_cell_inv
         gd = ge @ m_cell_faces
         # --------------------------------------------------------------------------------------------------------------
@@ -90,47 +88,8 @@ class Condensation:
         # --------------------------------------------------------------------------------------------------------------
         # vec
         # --------------------------------------------------------------------------------------------------------------
-        print("v_faces : \n{}".format(v_faces))
-        print("v_cell : \n{}".format(v_cell))
-        print("gd : \n{}".format(gd.shape))
         v_cond = v_faces - ge @ v_cell
         return m_cond, v_cond
-
-    # @staticmethod
-    # def get_condensated_system(matrix: Mat, vector: Mat, unknown: Unknown, cell_basis: Basis) -> Mat:
-    #     """
-    #     ================================================================================================================
-    #     Description :
-    #     ================================================================================================================
-
-    #     ================================================================================================================
-    #     Parameters :
-    #     ================================================================================================================
-
-    #     ================================================================================================================
-    #     Exemple :
-    #     ================================================================================================================
-
-    #     """
-    #     l1 = unknown.field_dimension * cell_basis.basis_dimension
-    #     m_cell_cell = matrix[:l1, :l1]
-    #     m_cell_faces = matrix[:l1, l1:]
-    #     m_faces_cell = matrix[l1:, :l1]
-    #     m_faces_faces = matrix[l1:, l1:]
-    #     v_cell = vector[:l1]
-    #     v_faces = vector[l1:]
-    #     # --------------------------------------------------------------------------------------------------------------
-    #     m_cell_cell_inv = np.linalg.inv(m_cell_cell)
-    #     gd = m_faces_cell @ m_cell_cell_inv @ m_cell_faces
-    #     # --------------------------------------------------------------------------------------------------------------
-    #     # mat
-    #     # --------------------------------------------------------------------------------------------------------------
-    #     m_cond = m_faces_faces - gd
-    #     # --------------------------------------------------------------------------------------------------------------
-    #     # vec
-    #     # --------------------------------------------------------------------------------------------------------------
-    #     v_cond = v_faces - gd @ v_cell
-    #     return (m_cond, v_cond), (m_cell_cell_inv, m_cell_faces, v_cell)
 
     @staticmethod
     def get_cell_unknown(m_cell_cell_inv: Mat, m_cell_faces: Mat, v_cell: Mat, x_faces: Mat) -> Mat:
@@ -148,14 +107,5 @@ class Condensation:
         ================================================================================================================
         
         """
-        print("m_cell_cell_inv : {}".format(m_cell_cell_inv.shape))
-        print("m_cell_faces : {}".format(m_cell_faces.shape))
-        print("x_faces : {}".format(x_faces.shape))
-        print("v_cell : {}".format(v_cell.shape))
         x_cell = m_cell_cell_inv @ v_cell - m_cell_cell_inv @ m_cell_faces @ x_faces
         return x_cell
-
-        # m_cell_cell_inv : (6, 6)
-        # m_cell_faces : (6, 12)
-        # x_faces : (6,)
-        # v_cell : (6,)

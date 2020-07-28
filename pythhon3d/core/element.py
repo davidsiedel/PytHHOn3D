@@ -13,13 +13,7 @@ from numpy import ndarray as Mat
 
 class Element:
     def __init__(
-        self,
-        # vertices: Mat,
-        cell: Cell,
-        # faces: List[Face],
-        local_gradient_operator: Mat,
-        local_stabilization_form: Mat,
-        local_mass_operator: Mat,
+        self, cell: Cell, local_gradient_operator: Mat, local_stabilization_form: Mat, local_mass_operator: Mat,
     ):
         """
         ================================================================================================================
@@ -35,9 +29,7 @@ class Element:
         ================================================================================================================
         
         """
-        # self.vertices = vertices
         self.cell = cell
-        # self.faces = faces
         self.local_gradient_operator = local_gradient_operator
         self.local_mass_operator = local_mass_operator
         self.local_stabilization_form = local_stabilization_form
