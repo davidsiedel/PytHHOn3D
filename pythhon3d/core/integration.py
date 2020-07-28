@@ -114,14 +114,20 @@ class Integration:
         """
         v_f = face.volume
         x_f = face.centroid
+        x_c = cell.centroid
+        v_c = cell.volume
         # --------------------------------------------------------------------------------------------------------------
         cell_mass_matrix_in_face = np.zeros((cell_basis.basis_dimension, cell_basis.basis_dimension))
         # --------------------------------------------------------------------------------------------------------------
         for x_Q_f, w_Q_f in zip(face.quadrature_nodes, face.quadrature_weights):
             # ----------------------------------------------------------------------------------------------------------
             phi_vector = cell_basis.get_phi_vector(x_Q_f, x_f, v_f)
+            phi_vector = cell_basis.get_phi_vector(x_Q_f, x_c, v_c)
             number_of_components = phi_vector.shape[0]
             phi_vector = np.resize(phi_vector, (1, number_of_components))
+            # print("x_Q_f : \n{}".format(x_Q_f))
+            # print("w_Q_f : \n{}".format(w_Q_f))
+            # print("phi_vector : \n{}".format(phi_vector))
             # ----------------------------------------------------------------------------------------------------------
             m = w_Q_f * phi_vector.T @ phi_vector
             cell_mass_matrix_in_face += m
@@ -157,7 +163,8 @@ class Integration:
             # ----------------------------------------------------------------------------------------------------------
             d_phi_vector = cell_basis.get_d_phi_vector(x_Q_c, x_c, v_c, dx)
             number_of_components = d_phi_vector.shape[0]
-            d_phi_vector = np.resize(phi_vector, (1, number_of_components))
+            d_phi_vector = np.resize(d_phi_vector, (1, number_of_components))
+            # print("d_phi_vector : {}".format(d_phi_vector))
             # ----------------------------------------------------------------------------------------------------------
             m = w_Q_c * phi_vector.T @ d_phi_vector
             cell_advection_matrix_in_cell += m
@@ -337,10 +344,46 @@ class Integration:
         x_c = cell.centroid
         # --------------------------------------------------------------------------------------------------------------
         cell_load_vector_in_cell = np.zeros((cell_basis.basis_dimension, cell_basis.basis_dimension))
+        cell_load_vector_in_cell = np.zeros((cell_basis.basis_dimension,))
         # --------------------------------------------------------------------------------------------------------------
         for x_Q_c, w_Q_c in zip(cell.quadrature_nodes, cell.quadrature_weights):
             # ----------------------------------------------------------------------------------------------------------
             phi_vector = cell_basis.get_phi_vector(x_Q_c, x_c, v_c)
-            v = w_Q_c * phi_vector.T * load(x_Q_c)
+            v = w_Q_c * phi_vector * load(x_Q_c)
             cell_load_vector_in_cell += v
         return cell_load_vector_in_cell
+
+    @staticmethod
+    def get_cell_tangent_matrix_in_cell(cell: Cell, cell_basis: Basis, behavior: Callable) -> Mat:
+        """
+        ================================================================================================================
+        Description :
+        ================================================================================================================
+        Returns the mass matrix in a cell-like domain using quadrature points and weights
+        ================================================================================================================
+        Parameters :
+        ================================================================================================================
+        - cell : the considered cell
+        - cell_basis : the polynomial basis of the cell
+        ================================================================================================================
+        Exemple :
+        ================================================================================================================
+        Let linear polynomials in a one dimensional cell C. The mass matrix is then the sum for all quadrature points
+        x_Q and quadrature weights w_Q of the following matricial contribution:
+        w_Q*| 1*1    x_Q*1  |
+            | 1*x_Q x_Q*x_Q |
+        """
+        v_c = cell.volume
+        x_c = cell.centroid
+        # --------------------------------------------------------------------------------------------------------------
+        cell_tangent_matrix_in_cell = np.zeros((cell_basis.basis_dimension, cell_basis.basis_dimension))
+        # --------------------------------------------------------------------------------------------------------------
+        for x_Q_c, w_Q_c in zip(cell.quadrature_nodes, cell.quadrature_weights):
+            # ----------------------------------------------------------------------------------------------------------
+            phi_vector = cell_basis.get_phi_vector(x_Q_c, x_c, v_c)
+            number_of_components = phi_vector.shape[0]
+            phi_vector = np.resize(phi_vector, (1, number_of_components))
+            # ----------------------------------------------------------------------------------------------------------
+            m = w_Q_c * phi_vector.T @ phi_vector * behavior(x_Q_c)
+            cell_tangent_matrix_in_cell += m
+        return cell_tangent_matrix_in_cell

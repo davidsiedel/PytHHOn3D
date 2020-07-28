@@ -1,8 +1,9 @@
 from core.face import Face
 from core.cell import Cell
-
-# from bases.basis import Basis
-# from bases.monomial import ScaledMonomial
+from core.integration import Integration
+from core.unknown import Unknown
+from bases.basis import Basis
+from bases.monomial import ScaledMonomial
 
 import numpy as np
 from typing import List
@@ -11,52 +12,49 @@ from numpy import ndarray as Mat
 
 class Operator:
     def __init__(
-        self,
-        # local_cell_mass_matrix: Mat,
-        # # local_face_mass_matrix: Mat,
-        # local_identity_operator: Mat,
-        # local_reconstructed_gradient_operators: List[Mat],
-        # local_stabilization_matrix: Mat,
-        # local_load_vectors: Mat,
-        # local_pressure_vectors: Mat,
-        local_gradient_opertor: Mat,
-        local_stabilization_matrix: Mat,
-        local_mass_matrix: Mat,
+        self, local_gradient_operator: Mat, local_stabilization_form: Mat, local_mass_operator: Mat,
     ):
         """
         ================================================================================================================
         Class :
         ================================================================================================================
-        The Operator class provides general a framework to build an non-confromal element. It is built using both the
-        local gradient operator and the stabilization operator that are used in non-conformal methods to define the local equilibrium of a cell.
-        The local gradient is used in place of the regular gradient operator (see e.g. the Basis class) to write a
-        behavior law.
-        The stabilization operator is used to define a stabilization force that relates the cell to faces, in order to
-        recover a weak form of regularity.
+        
         ================================================================================================================
         Parameters :
         ================================================================================================================
-        - local_gradient_operators : the local gradient operator for the given element
-        - local_stabilization_matrix : the local stabilization operator for the given element
+        
         ================================================================================================================
         Attributes :
         ================================================================================================================
-        - local_gradient_operators : the local gradient operator for the given element
-        - local_stabilization_matrix : the local stabilization operator for the given element
+        
         """
-        self.local_gradient_opertor = local_b_operator
-        self.local_stabilization_matrix = k_z
-        self.local_mass_matrix = Integration.get_cell_mass_matrix_in_cell(cell, cell_basis)
-        #
-        # self.local_cell_mass_matrix = local_cell_mass_matrix
-        # # self.local_face_mass_matrix = local_face_mass_matrix
-        # self.local_identity_operator = local_identity_operator
-        # self.local_reconstructed_gradient_operators = local_reconstructed_gradient_operators
-        # self.local_stabilization_matrix = local_stabilization_matrix
-        # self.local_load_vectors = local_load_vectors
-        # self.local_pressure_vectors = local_pressure_vectors
+        self.local_gradient_operator = local_gradient_operator
+        self.local_stabilization_form = local_stabilization_form
+        self.local_mass_operator = local_mass_operator
 
-    def get_vector_to_face(self, cell: Cell, face: Face) -> Mat:
+    def get_local_problem_size(self, faces: List[Face], cell_basis: Basis, face_basis: Basis, unknown: Unknown):
+        """
+        ================================================================================================================
+        Description :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Parameters :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Exemple :
+        ================================================================================================================
+        """
+        number_of_faces = len(faces)
+        local_problem_size = (
+            cell_basis.basis_dimension * unknown.field_dimension
+            + number_of_faces * face_basis.basis_dimension * unknown.field_dimension
+        )
+        return local_problem_size
+
+    @staticmethod
+    def get_vector_to_face(cell: Cell, face: Face) -> Mat:
         """
         ================================================================================================================
         Description :
@@ -76,7 +74,8 @@ class Operator:
         vector_to_face = (p @ (cell.centroid - face.centroid).T).T
         return vector_to_face
 
-    def get_swaped_face_reference_frame_transformation_matrix(self, cell: Cell, face: Face) -> Mat:
+    @staticmethod
+    def get_swaped_face_reference_frame_transformation_matrix(cell: Cell, face: Face) -> Mat:
         """
         ================================================================================================================
         Description :
@@ -100,12 +99,12 @@ class Operator:
         # --------------------------------------------------------------------------------------------------------------
         if problem_dimension == 3:
             # swaped_reference_frame_transformation_matrix = np.array([p[1], p[0], -p[2]])
-            swaped_reference_frame_transformation_matrix = np.array([-p[0], p[1], -p[2]])
+            swaped_reference_frame_transformation_matrix = np.array([p[0], p[1], -p[2]])
         # --------------------------------------------------------------------------------------------------------------
         # 1d faces in 2d cells
         # --------------------------------------------------------------------------------------------------------------
         if problem_dimension == 2:
-            swaped_reference_frame_transformation_matrix = np.array([-p[0], -p[1]])
+            swaped_reference_frame_transformation_matrix = np.array([p[0], -p[1]])
         # --------------------------------------------------------------------------------------------------------------
         # 0d faces in 1d cells
         # --------------------------------------------------------------------------------------------------------------
@@ -113,7 +112,8 @@ class Operator:
             swaped_reference_frame_transformation_matrix = p
         return swaped_reference_frame_transformation_matrix
 
-    def get_face_passmat(self, cell: Cell, face: Face):
+    @staticmethod
+    def get_face_passmat(cell: Cell, face: Face):
         """
         ================================================================================================================
         Description :
@@ -127,11 +127,9 @@ class Operator:
         Exemple :
         ================================================================================================================
         """
-        vector_to_face = self.get_vector_to_face(cell, face)
+        vector_to_face = Operator.get_vector_to_face(cell, face)
         if vector_to_face[-1] > 0:
-            n = -1
-            passmat = self.get_swaped_face_reference_frame_transformation_matrix(cell, face)
+            passmat = Operator.get_swaped_face_reference_frame_transformation_matrix(cell, face)
         else:
-            n = 1
             passmat = face.reference_frame_transformation_matrix
         return passmat

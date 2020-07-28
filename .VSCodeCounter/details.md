@@ -1,10 +1,10 @@
 # Details
 
-Date : 2020-07-16 15:44:01
+Date : 2020-07-27 13:21:31
 
 Directory /Users/davidsiedel/Projects/PytHHOn3D
 
-Total : 54 files,  2701 codes, 1343 comments, 390 blanks, all 4434 lines
+Total : 60 files,  3621 codes, 2253 comments, 452 blanks, all 6326 lines
 
 [summary](results.md)
 
@@ -15,28 +15,34 @@ Total : 54 files,  2701 codes, 1343 comments, 390 blanks, all 4434 lines
 | [TODO.md](/TODO.md) | source.markdown.math | 3 | 0 | 0 | 3 |
 | [poetry.lock](/poetry.lock) | toml | 705 | 0 | 75 | 780 |
 | [pythhon3d/__init__.py](/pythhon3d/__init__.py) | Python | 1 | 0 | 2 | 3 |
-| [pythhon3d/__main__.py](/pythhon3d/__main__.py) | Python | 21 | 12 | 5 | 38 |
+| [pythhon3d/__main__.py](/pythhon3d/__main__.py) | Python | 71 | 23 | 6 | 100 |
 | [pythhon3d/bases/__init__.py](/pythhon3d/bases/__init__.py) | Python | 0 | 0 | 1 | 1 |
 | [pythhon3d/bases/basis.py](/pythhon3d/bases/basis.py) | Python | 6 | 15 | 3 | 24 |
-| [pythhon3d/bases/monomial.py](/pythhon3d/bases/monomial.py) | Python | 61 | 142 | 7 | 210 |
+| [pythhon3d/bases/monomial.py](/pythhon3d/bases/monomial.py) | Python | 61 | 147 | 7 | 215 |
 | [pythhon3d/behaviors/__init__.py](/pythhon3d/behaviors/__init__.py) | Python | 0 | 0 | 1 | 1 |
-| [pythhon3d/behaviors/behavior.py](/pythhon3d/behaviors/behavior.py) | Python | 19 | 14 | 6 | 39 |
-| [pythhon3d/behaviors/elasticity.py](/pythhon3d/behaviors/elasticity.py) | Python | 29 | 36 | 9 | 74 |
+| [pythhon3d/behaviors/behavior.py](/pythhon3d/behaviors/behavior.py) | Python | 9 | 14 | 4 | 27 |
+| [pythhon3d/behaviors/laplacian.py](/pythhon3d/behaviors/laplacian.py) | Python | 30 | 14 | 4 | 48 |
 | [pythhon3d/core/__init__.py](/pythhon3d/core/__init__.py) | Python | 0 | 0 | 1 | 1 |
-| [pythhon3d/core/assembly.py](/pythhon3d/core/assembly.py) | Python | 9 | 3 | 5 | 17 |
 | [pythhon3d/core/boundary.py](/pythhon3d/core/boundary.py) | Python | 12 | 3 | 3 | 18 |
-| [pythhon3d/core/cell.py](/pythhon3d/core/cell.py) | Python | 70 | 28 | 6 | 104 |
-| [pythhon3d/core/elements/__init__.py](/pythhon3d/core/elements/__init__.py) | Python | 0 | 0 | 1 | 1 |
-| [pythhon3d/core/elements/element.py](/pythhon3d/core/elements/element.py) | Python | 30 | 18 | 4 | 52 |
-| [pythhon3d/core/face.py](/pythhon3d/core/face.py) | Python | 118 | 130 | 10 | 258 |
-| [pythhon3d/core/integration.py](/pythhon3d/core/integration.py) | Python | 131 | 166 | 12 | 309 |
+| [pythhon3d/core/cell.py](/pythhon3d/core/cell.py) | Python | 72 | 31 | 6 | 109 |
+| [pythhon3d/core/condensation.py](/pythhon3d/core/condensation.py) | Python | 40 | 97 | 11 | 148 |
+| [pythhon3d/core/element.py](/pythhon3d/core/element.py) | Python | 26 | 14 | 4 | 44 |
+| [pythhon3d/core/face.py](/pythhon3d/core/face.py) | Python | 116 | 133 | 10 | 259 |
+| [pythhon3d/core/integration.py](/pythhon3d/core/integration.py) | Python | 165 | 211 | 14 | 390 |
+| [pythhon3d/core/load.py](/pythhon3d/core/load.py) | Python | 28 | 27 | 5 | 60 |
 | [pythhon3d/core/operators/__init__.py](/pythhon3d/core/operators/__init__.py) | Python | 0 | 0 | 1 | 1 |
-| [pythhon3d/core/operators/hdg.py](/pythhon3d/core/operators/hdg.py) | Python | 74 | 58 | 4 | 136 |
-| [pythhon3d/core/operators/operator.py](/pythhon3d/core/operators/operator.py) | Python | 33 | 64 | 7 | 104 |
+| [pythhon3d/core/operators/hdg.py](/pythhon3d/core/operators/hdg.py) | Python | 66 | 65 | 5 | 136 |
+| [pythhon3d/core/operators/hdg0.py](/pythhon3d/core/operators/hdg0.py) | Python | 256 | 287 | 16 | 559 |
+| [pythhon3d/core/operators/hdg1.py](/pythhon3d/core/operators/hdg1.py) | Python | 47 | 15 | 8 | 70 |
+| [pythhon3d/core/operators/hdg9.py](/pythhon3d/core/operators/hdg9.py) | Python | 238 | 206 | 11 | 455 |
+| [pythhon3d/core/operators/operator.py](/pythhon3d/core/operators/operator.py) | Python | 44 | 81 | 8 | 133 |
+| [pythhon3d/core/pressure.py](/pythhon3d/core/pressure.py) | Python | 29 | 27 | 5 | 61 |
+| [pythhon3d/core/problem.py](/pythhon3d/core/problem.py) | Python | 39 | 39 | 5 | 83 |
+| [pythhon3d/core/unknown.py](/pythhon3d/core/unknown.py) | Python | 49 | 17 | 4 | 70 |
 | [pythhon3d/parsers/__init__.py](/pythhon3d/parsers/__init__.py) | Python | 0 | 0 | 1 | 1 |
 | [pythhon3d/parsers/element_types.py](/pythhon3d/parsers/element_types.py) | Python | 11 | 0 | 3 | 14 |
 | [pythhon3d/parsers/geof_parser.py](/pythhon3d/parsers/geof_parser.py) | Python | 99 | 81 | 5 | 185 |
-| [pythhon3d/pythhon3d.py](/pythhon3d/pythhon3d.py) | Python | 77 | 80 | 10 | 167 |
+| [pythhon3d/pythhon3d.py](/pythhon3d/pythhon3d.py) | Python | 205 | 213 | 15 | 433 |
 | [pythhon3d/quadratures/__init__.py](/pythhon3d/quadratures/__init__.py) | Python | 0 | 0 | 1 | 1 |
 | [pythhon3d/quadratures/dunavant.py](/pythhon3d/quadratures/dunavant.py) | Python | 232 | 110 | 7 | 349 |
 | [pythhon3d/shapes/__init__.py](/pythhon3d/shapes/__init__.py) | Python | 0 | 0 | 1 | 1 |
@@ -47,7 +53,7 @@ Total : 54 files,  2701 codes, 1343 comments, 390 blanks, all 4434 lines
 | [pythhon3d/shapes/segment.py](/pythhon3d/shapes/segment.py) | Python | 19 | 28 | 5 | 52 |
 | [pythhon3d/shapes/tetrahedron.py](/pythhon3d/shapes/tetrahedron.py) | Python | 22 | 28 | 5 | 55 |
 | [pythhon3d/shapes/triangle.py](/pythhon3d/shapes/triangle.py) | Python | 22 | 28 | 5 | 55 |
-| [questions_nicolas.md](/questions_nicolas.md) | source.markdown.math | 7 | 0 | 2 | 9 |
+| [questions_nicolas.md](/questions_nicolas.md) | source.markdown.math | 8 | 0 | 2 | 10 |
 | [tests/__init__.py](/tests/__init__.py) | Python | 0 | 0 | 1 | 1 |
 | [tests/context.py](/tests/context.py) | Python | 6 | 0 | 2 | 8 |
 | [tests/test_bases/__init__.py](/tests/test_bases/__init__.py) | Python | 0 | 0 | 1 | 1 |

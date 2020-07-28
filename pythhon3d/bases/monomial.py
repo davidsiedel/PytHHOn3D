@@ -204,6 +204,11 @@ class ScaledMonomial(Basis):
         d_phi_vector = (1/volume) @ gradient_operator @ phi_vector
         """
         grad_dx = self.global_gradients[dx]
+        # print("grad_dx : {}".format(grad_dx))
         phi_vector = self.get_phi_vector(point, centroid, volume)
+        # print("phi_vector : {}".format(phi_vector))
+        # print("res : {}".format(grad_dx @ phi_vector.T))
         d_phi_vector = (1.0 / volume) * (grad_dx @ phi_vector.T)
+        # print("d_phi_vector : {}".format(d_phi_vector))
+        # print("---")
         return d_phi_vector

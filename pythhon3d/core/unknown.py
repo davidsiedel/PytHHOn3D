@@ -7,7 +7,14 @@ from core.cell import Cell
 
 
 class Unknown:
-    def __init__(self, problem_dimension: int, field_dimension: int, symmetric_gradient: bool = False):
+    def __init__(
+        self,
+        problem_dimension: int,
+        field_dimension: int,
+        cell_polynomial_order: int,
+        face_polynomial_order: int,
+        symmetric_gradient: bool = False,
+    ):
         """
         ================================================================================================================
         Class :
@@ -55,5 +62,8 @@ class Unknown:
         self.field_dimension = field_dimension
         self.indices = indices
         self.symmetric_gradient = symmetric_gradient
+        self.cell_polynomial_order = cell_polynomial_order
+        self.face_polynomial_order = face_polynomial_order
+        self.integration_order = 2 * max(face_polynomial_order, cell_polynomial_order)
         # self.symmetric_gradient = symmetric_gradient
         # self.field_dimension = field_dimension

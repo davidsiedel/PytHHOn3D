@@ -1,27 +1,26 @@
-Date : 2020-07-16 15:44:01
+Date : 2020-07-27 13:21:31
 Directory : /Users/davidsiedel/Projects/PytHHOn3D
-Total : 54 files,  2701 codes, 1343 comments, 390 blanks, all 4434 lines
+Total : 60 files,  3621 codes, 2253 comments, 452 blanks, all 6326 lines
 
 Languages
 +----------------------+------------+------------+------------+------------+------------+
 | language             | files      | code       | comment    | blank      | total      |
 +----------------------+------------+------------+------------+------------+------------+
-| Python               |         50 |      1,986 |      1,343 |        312 |      3,641 |
+| Python               |         56 |      2,905 |      2,253 |        374 |      5,532 |
 | toml                 |          1 |        705 |          0 |         75 |        780 |
-| source.markdown.math |          3 |         10 |          0 |          3 |         13 |
+| source.markdown.math |          3 |         11 |          0 |          3 |         14 |
 +----------------------+------------+------------+------------+------------+------------+
 
 Directories
 +-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
 | path                                                                          | files      | code       | comment    | blank      | total      |
 +-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
-| .                                                                             |         54 |      2,701 |      1,343 |        390 |      4,434 |
-| pythhon3d                                                                     |         33 |      1,238 |      1,198 |        150 |      2,586 |
-| pythhon3d/bases                                                               |          3 |         67 |        157 |         11 |        235 |
-| pythhon3d/behaviors                                                           |          3 |         48 |         50 |         16 |        114 |
-| pythhon3d/core                                                                |         11 |        477 |        470 |         54 |      1,001 |
-| pythhon3d/core/elements                                                       |          2 |         30 |         18 |          5 |         53 |
-| pythhon3d/core/operators                                                      |          3 |        107 |        122 |         12 |        241 |
+| .                                                                             |         60 |      3,621 |      2,253 |        452 |      6,326 |
+| pythhon3d                                                                     |         39 |      2,157 |      2,108 |        212 |      4,477 |
+| pythhon3d/bases                                                               |          3 |         67 |        162 |         11 |        240 |
+| pythhon3d/behaviors                                                           |          3 |         39 |         28 |          9 |         76 |
+| pythhon3d/core                                                                |         17 |      1,227 |      1,253 |        117 |      2,597 |
+| pythhon3d/core/operators                                                      |          6 |        651 |        654 |         49 |      1,354 |
 | pythhon3d/parsers                                                             |          3 |        110 |         81 |          9 |        200 |
 | pythhon3d/quadratures                                                         |          2 |        232 |        110 |          8 |        350 |
 | pythhon3d/shapes                                                              |          8 |        205 |        238 |         35 |        478 |
@@ -40,28 +39,34 @@ Files
 | /Users/davidsiedel/Projects/PytHHOn3D/TODO.md                                 | source.markdown.math |          3 |          0 |          0 |          3 |
 | /Users/davidsiedel/Projects/PytHHOn3D/poetry.lock                             | toml                 |        705 |          0 |         75 |        780 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/__init__.py                   | Python               |          1 |          0 |          2 |          3 |
-| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/__main__.py                   | Python               |         21 |         12 |          5 |         38 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/__main__.py                   | Python               |         71 |         23 |          6 |        100 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/bases/__init__.py             | Python               |          0 |          0 |          1 |          1 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/bases/basis.py                | Python               |          6 |         15 |          3 |         24 |
-| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/bases/monomial.py             | Python               |         61 |        142 |          7 |        210 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/bases/monomial.py             | Python               |         61 |        147 |          7 |        215 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/behaviors/__init__.py         | Python               |          0 |          0 |          1 |          1 |
-| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/behaviors/behavior.py         | Python               |         19 |         14 |          6 |         39 |
-| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/behaviors/elasticity.py       | Python               |         29 |         36 |          9 |         74 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/behaviors/behavior.py         | Python               |          9 |         14 |          4 |         27 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/behaviors/laplacian.py        | Python               |         30 |         14 |          4 |         48 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/__init__.py              | Python               |          0 |          0 |          1 |          1 |
-| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/assembly.py              | Python               |          9 |          3 |          5 |         17 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/boundary.py              | Python               |         12 |          3 |          3 |         18 |
-| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/cell.py                  | Python               |         70 |         28 |          6 |        104 |
-| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/elements/__init__.py     | Python               |          0 |          0 |          1 |          1 |
-| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/elements/element.py      | Python               |         30 |         18 |          4 |         52 |
-| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/face.py                  | Python               |        118 |        130 |         10 |        258 |
-| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/integration.py           | Python               |        131 |        166 |         12 |        309 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/cell.py                  | Python               |         72 |         31 |          6 |        109 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/condensation.py          | Python               |         40 |         97 |         11 |        148 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/element.py               | Python               |         26 |         14 |          4 |         44 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/face.py                  | Python               |        116 |        133 |         10 |        259 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/integration.py           | Python               |        165 |        211 |         14 |        390 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/load.py                  | Python               |         28 |         27 |          5 |         60 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/operators/__init__.py    | Python               |          0 |          0 |          1 |          1 |
-| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/operators/hdg.py         | Python               |         74 |         58 |          4 |        136 |
-| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/operators/operator.py    | Python               |         33 |         64 |          7 |        104 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/operators/hdg.py         | Python               |         66 |         65 |          5 |        136 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/operators/hdg0.py        | Python               |        256 |        287 |         16 |        559 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/operators/hdg1.py        | Python               |         47 |         15 |          8 |         70 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/operators/hdg9.py        | Python               |        238 |        206 |         11 |        455 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/operators/operator.py    | Python               |         44 |         81 |          8 |        133 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/pressure.py              | Python               |         29 |         27 |          5 |         61 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/problem.py               | Python               |         39 |         39 |          5 |         83 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/core/unknown.py               | Python               |         49 |         17 |          4 |         70 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/parsers/__init__.py           | Python               |          0 |          0 |          1 |          1 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/parsers/element_types.py      | Python               |         11 |          0 |          3 |         14 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/parsers/geof_parser.py        | Python               |         99 |         81 |          5 |        185 |
-| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/pythhon3d.py                  | Python               |         77 |         80 |         10 |        167 |
+| /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/pythhon3d.py                  | Python               |        205 |        213 |         15 |        433 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/quadratures/__init__.py       | Python               |          0 |          0 |          1 |          1 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/quadratures/dunavant.py       | Python               |        232 |        110 |          7 |        349 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/shapes/__init__.py            | Python               |          0 |          0 |          1 |          1 |
@@ -72,7 +77,7 @@ Files
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/shapes/segment.py             | Python               |         19 |         28 |          5 |         52 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/shapes/tetrahedron.py         | Python               |         22 |         28 |          5 |         55 |
 | /Users/davidsiedel/Projects/PytHHOn3D/pythhon3d/shapes/triangle.py            | Python               |         22 |         28 |          5 |         55 |
-| /Users/davidsiedel/Projects/PytHHOn3D/questions_nicolas.md                    | source.markdown.math |          7 |          0 |          2 |          9 |
+| /Users/davidsiedel/Projects/PytHHOn3D/questions_nicolas.md                    | source.markdown.math |          8 |          0 |          2 |         10 |
 | /Users/davidsiedel/Projects/PytHHOn3D/tests/__init__.py                       | Python               |          0 |          0 |          1 |          1 |
 | /Users/davidsiedel/Projects/PytHHOn3D/tests/context.py                        | Python               |          6 |          0 |          2 |          8 |
 | /Users/davidsiedel/Projects/PytHHOn3D/tests/test_bases/__init__.py            | Python               |          0 |          0 |          1 |          1 |
@@ -90,5 +95,5 @@ Files
 | /Users/davidsiedel/Projects/PytHHOn3D/tests/test_shapes/test_segment.py       | Python               |         40 |         34 |         16 |         90 |
 | /Users/davidsiedel/Projects/PytHHOn3D/tests/test_shapes/test_tetrahedron.py   | Python               |         63 |          0 |         11 |         74 |
 | /Users/davidsiedel/Projects/PytHHOn3D/tests/test_shapes/test_triangle.py      | Python               |         39 |          1 |         11 |         51 |
-| Total                                                                         |                      |      2,701 |      1,343 |        390 |      4,434 |
+| Total                                                                         |                      |      3,621 |      2,253 |        452 |      6,326 |
 +-------------------------------------------------------------------------------+----------------------+------------+------------+------------+------------+

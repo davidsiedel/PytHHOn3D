@@ -30,7 +30,7 @@ class Laplacian(Behavior):
             tangent_matrix = np.array(
                 [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
             )
-        if problem_dimension == 2:
+        if problem_dimension == 3:
             tangent_matrix = np.array(
                 [
                     [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
