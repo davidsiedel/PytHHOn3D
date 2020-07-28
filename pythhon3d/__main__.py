@@ -9,8 +9,6 @@ from core.face import Face
 from core.cell import Cell
 from core.operators.operator import Operator
 from core.operators.hdg import HDG
-from behaviors.behavior import Behavior
-from behaviors.laplacian import Laplacian
 
 from pythhon3d import build, solve
 

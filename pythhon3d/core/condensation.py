@@ -8,8 +8,6 @@ from core.load import Load
 from core.pressure import Pressure
 from bases.basis import Basis
 from bases.monomial import ScaledMonomial
-from behaviors.behavior import Behavior
-from behaviors.laplacian import Laplacian
 
 import numpy as np
 from typing import List

@@ -19,8 +19,6 @@ from core.displacement import Displacement
 from core.load import Load
 from core.condensation import Condensation
 from core.integration import Integration
-from behaviors.behavior import Behavior
-from behaviors.laplacian import Laplacian
 
 
 def build(
@@ -401,8 +399,8 @@ def solve(
         local_cell = cells[cell_index]
         cell_faces_connectivity_matrix = cells_faces_connectivity_matrix[cell_index]
         local_faces = [faces[i] for i in cell_faces_connectivity_matrix]
-        a = len(local_faces) * face_basis.basis_dimension * unknown.field_dimension
-        x_faces = np.zeros((a,))
+        faces_unknown_dimension = len(local_faces) * face_basis.basis_dimension * unknown.field_dimension
+        x_faces = np.zeros((faces_unknown_dimension,))
         for local_index_col, global_index_col in enumerate(cell_faces_connectivity_matrix):
             g0c = global_index_col * face_basis.basis_dimension * unknown.field_dimension
             g1c = (global_index_col + 1) * face_basis.basis_dimension * unknown.field_dimension

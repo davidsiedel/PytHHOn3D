@@ -1,29 +1,28 @@
 # Summary
 
-Date : 2020-07-27 13:21:31
+Date : 2020-07-28 16:35:26
 
 Directory /Users/davidsiedel/Projects/PytHHOn3D
 
-Total : 60 files,  3621 codes, 2253 comments, 452 blanks, all 6326 lines
+Total : 52 files,  3154 codes, 1565 comments, 394 blanks, all 5113 lines
 
 [details](details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Python | 56 | 2,905 | 2,253 | 374 | 5,532 |
+| Python | 48 | 2,438 | 1,565 | 316 | 4,319 |
 | toml | 1 | 705 | 0 | 75 | 780 |
 | source.markdown.math | 3 | 11 | 0 | 3 | 14 |
 
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 60 | 3,621 | 2,253 | 452 | 6,326 |
-| pythhon3d | 39 | 2,157 | 2,108 | 212 | 4,477 |
+| . | 52 | 3,154 | 1,565 | 394 | 5,113 |
+| pythhon3d | 31 | 1,690 | 1,420 | 154 | 3,264 |
 | pythhon3d/bases | 3 | 67 | 162 | 11 | 240 |
-| pythhon3d/behaviors | 3 | 39 | 28 | 9 | 76 |
-| pythhon3d/core | 17 | 1,227 | 1,253 | 117 | 2,597 |
-| pythhon3d/core/operators | 6 | 651 | 654 | 49 | 1,354 |
+| pythhon3d/core | 12 | 638 | 683 | 71 | 1,392 |
+| pythhon3d/core/operators | 3 | 111 | 149 | 14 | 274 |
 | pythhon3d/parsers | 3 | 110 | 81 | 9 | 200 |
 | pythhon3d/quadratures | 2 | 232 | 110 | 8 | 350 |
 | pythhon3d/shapes | 8 | 205 | 238 | 35 | 478 |
