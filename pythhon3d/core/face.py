@@ -9,6 +9,7 @@ from shapes.point import Point
 from shapes.segment import Segment
 from shapes.triangle import Triangle
 from shapes.polygon import Polygon
+from shapes.quadrangle import Quadrangle
 
 
 class Face(Domain):
@@ -51,6 +52,7 @@ class Face(Domain):
             f = Point(vertices_in_face_reference_frame)
             centroid = f.centroid
             volume = f.volume
+            diameter = f.diameter
             quadrature_nodes = f.quadrature_nodes
             quadrature_weights = f.quadrature_weights
             del f
@@ -58,6 +60,7 @@ class Face(Domain):
             f = Segment(vertices_in_face_reference_frame, polynomial_order)
             centroid = f.centroid
             volume = f.volume
+            diameter = f.diameter
             quadrature_nodes = f.quadrature_nodes
             quadrature_weights = f.quadrature_weights
             del f
@@ -65,6 +68,15 @@ class Face(Domain):
             f = Triangle(vertices_in_face_reference_frame, polynomial_order)
             centroid = f.centroid
             volume = f.volume
+            diameter = f.diameter
+            quadrature_nodes = f.quadrature_nodes
+            quadrature_weights = f.quadrature_weights
+            del f
+        if face_shape == "QUADRANGLE":
+            f = Quadrangle(vertices_in_face_reference_frame, polynomial_order)
+            centroid = f.centroid
+            volume = f.volume
+            diameter = f.diameter
             quadrature_nodes = f.quadrature_nodes
             quadrature_weights = f.quadrature_weights
             del f
@@ -72,6 +84,7 @@ class Face(Domain):
             f = Polygon(vertices_in_face_reference_frame, polynomial_order)
             centroid = f.centroid
             volume = f.volume
+            diameter = f.diameter
             quadrature_nodes = f.quadrature_nodes
             quadrature_weights = f.quadrature_weights
             del f
@@ -105,7 +118,7 @@ class Face(Domain):
         # --------------------------------------------------------------------------------------------------------------
         # Building the face domain
         # --------------------------------------------------------------------------------------------------------------
-        super().__init__(centroid, volume, quadrature_points, quadrature_weights)
+        super().__init__(centroid, volume, diameter, quadrature_points, quadrature_weights)
 
     @staticmethod
     def get_face_shape(vertices: Mat) -> str:

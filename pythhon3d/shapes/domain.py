@@ -4,7 +4,9 @@ import numpy as np
 
 
 class Domain:
-    def __init__(self, centroid: Mat, volume: float, quadrature_nodes: List[Mat], quadrature_weights: List[Mat]):
+    def __init__(
+        self, centroid: Mat, volume: float, diameter: float, quadrature_nodes: List[Mat], quadrature_weights: List[Mat]
+    ):
         """
         ================================================================================================================
         Class :
@@ -21,6 +23,7 @@ class Domain:
         """
         self.centroid = centroid
         self.volume = volume
+        self.diameter = diameter
         self.quadrature_nodes = quadrature_nodes
         self.quadrature_weights = quadrature_weights
 

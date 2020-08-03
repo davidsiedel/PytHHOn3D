@@ -37,6 +37,40 @@ class DunavantRule:
         quadrature_nodes, quadrature_weights = np.array([[]]), np.array([[1.0]])
         return quadrature_nodes, quadrature_weights
 
+    # @staticmethod
+    # def get_segment0_quadrature(vertices, volume, k):
+    #     """
+    #     ================================================================================================================
+    #     Description :
+    #     ================================================================================================================
+
+    #     ================================================================================================================
+    #     Parameters :
+    #     ================================================================================================================
+
+    #     ================================================================================================================
+    #     Exemple :
+    #     ================================================================================================================
+
+    #     """
+    #     barycenter = 0.5000 * (vertices[0][0] + vertices[1][0])
+    #     if k == 1:
+    #         quadrature_nodes = np.array([[barycenter]])
+    #         quadrature_weights = np.array([[volume]])
+    #     if k in [2, 3]:
+    #         quadrature_nodes = np.array(
+    #             [[barycenter - volume * 0.28867513459481287], [barycenter + volume * 0.28867513459481287],]
+    #         )
+    #         quadrature_weights = np.array([[volume * 0.5000], [volume * 0.5000]])
+    #     if k in [4, 5]:
+    #         quadrature_nodes = np.array(
+    #             [[barycenter - volume * 0.3872983346207417], [barycenter], [barycenter + volume * 0.3872983346207417],]
+    #         )
+    #         quadrature_weights = np.array(
+    #             [[volume * 0.2777777777777778], [volume * 0.4444444444444444], [volume * 0.2777777777777778],]
+    #         )
+    #     return quadrature_nodes, quadrature_weights
+
     @staticmethod
     def get_segment_quadrature(vertices, volume, k):
         """
@@ -53,19 +87,37 @@ class DunavantRule:
         ================================================================================================================
         
         """
-        barycenter = 0.5000 * (vertices[0][0] + vertices[1][0])
         if k == 1:
-            quadrature_nodes = np.array([[barycenter]])
+            barycentric_coordinates = np.array([[0.5000000000000000, 0.5000000000000000]])
+            quadrature_nodes = []
+            for barycentric_coordinate in barycentric_coordinates:
+                node_Q = np.sum((vertices * np.array([barycentric_coordinate]).T), axis=0)
+                quadrature_nodes.append(node_Q)
+            quadrature_nodes = np.array(quadrature_nodes)
             quadrature_weights = np.array([[volume]])
         if k in [2, 3]:
-            quadrature_nodes = np.array(
-                [[barycenter - volume * 0.28867513459481287], [barycenter + volume * 0.28867513459481287],]
+            barycentric_coordinates = np.array(
+                [[0.78867513459481290, 0.21132486540518713], [0.21132486540518713, 0.78867513459481290],]
             )
-            quadrature_weights = np.array([[volume * 0.5000], [volume * 0.5000]])
+            quadrature_nodes = []
+            for barycentric_coordinate in barycentric_coordinates:
+                node_Q = np.sum((vertices * np.array([barycentric_coordinate]).T), axis=0)
+                quadrature_nodes.append(node_Q)
+            quadrature_nodes = np.array(quadrature_nodes)
+            quadrature_weights = np.array([[volume * 0.50000000000000000], [volume * 0.50000000000000000]])
         if k in [4, 5]:
-            quadrature_nodes = np.array(
-                [[barycenter - volume * 0.3872983346207417], [barycenter], [barycenter + volume * 0.3872983346207417],]
+            barycentric_coordinates = np.array(
+                [
+                    [0.11270166537925830, 0.88729833462074170],
+                    [0.50000000000000000, 0.50000000000000000],
+                    [0.88729833462074170, 0.11270166537925830],
+                ]
             )
+            quadrature_nodes = []
+            for barycentric_coordinate in barycentric_coordinates:
+                node_Q = np.sum((vertices * np.array([barycentric_coordinate]).T), axis=0)
+                quadrature_nodes.append(node_Q)
+            quadrature_nodes = np.array(quadrature_nodes)
             quadrature_weights = np.array(
                 [[volume * 0.2777777777777778], [volume * 0.4444444444444444], [volume * 0.2777777777777778],]
             )
@@ -185,6 +237,93 @@ class DunavantRule:
                     [0.132394152788506 * volume],
                     [0.132394152788506 * volume],
                     [0.132394152788506 * volume],
+                ]
+            )
+        return quadrature_nodes, quadrature_weights
+
+    @staticmethod
+    def get_quadrangle_quadrature(vertices, volume, k):
+        """
+        ================================================================================================================
+        Description :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Parameters :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Exemple :
+        ================================================================================================================
+        
+        """
+        if k == 1:
+            barycentric_coordinates = np.array(
+                [[0.25000000000000000, 0.25000000000000000, 0.25000000000000000, 0.25000000000000000],]
+            )
+            quadrature_nodes = []
+            for barycentric_coordinate in barycentric_coordinates:
+                node_Q = np.sum((vertices * np.array([barycentric_coordinate]).T), axis=0)
+                quadrature_nodes.append(node_Q)
+            quadrature_nodes = np.array(quadrature_nodes)
+            quadrature_weights = np.array([[1.0000000000000000 * volume]])
+        if k in [2, 3]:
+            barycentric_coordinates = np.array(
+                [
+                    [0.68301270189221940, 0.10566243270259354, 0.10566243270259354, 0.10566243270259354],
+                    [0.10566243270259354, 0.68301270189221940, 0.10566243270259354, 0.10566243270259354],
+                    [0.10566243270259354, 0.10566243270259354, 0.68301270189221940, 0.10566243270259354],
+                    [0.10566243270259354, 0.10566243270259354, 0.10566243270259354, 0.68301270189221940],
+                ]
+            )
+            quadrature_nodes = []
+            for barycentric_coordinate in barycentric_coordinates:
+                node_Q = np.sum((vertices * np.array([barycentric_coordinate]).T), axis=0)
+                quadrature_nodes.append(node_Q)
+            quadrature_nodes = np.array(quadrature_nodes)
+            quadrature_weights = np.array(
+                [
+                    [0.2500000000000000 * volume],
+                    [0.2500000000000000 * volume],
+                    [0.2500000000000000 * volume],
+                    [0.2500000000000000 * volume],
+                ]
+            )
+        if k in [4, 5]:
+            barycentric_coordinates = np.array(
+                [
+                    [0.25000000000000000, 0.25000000000000000, 0.25000000000000000, 0.25000000000000000],
+                    #
+                    [0.83094750193111260, 0.05635083268962915, 0.05635083268962915, 0.05635083268962915],
+                    [0.05635083268962915, 0.83094750193111260, 0.05635083268962915, 0.05635083268962915],
+                    [0.05635083268962915, 0.05635083268962915, 0.83094750193111260, 0.05635083268962915],
+                    [0.05635083268962915, 0.05635083268962915, 0.05635083268962915, 0.83094750193111260],
+                    #
+                    [0.44364916731037085, 0.44364916731037085, 0.05635083268962915, 0.05635083268962915],
+                    [0.05635083268962915, 0.44364916731037085, 0.44364916731037085, 0.05635083268962915],
+                    [0.05635083268962915, 0.05635083268962915, 0.44364916731037085, 0.44364916731037085],
+                    [0.44364916731037085, 0.05635083268962915, 0.05635083268962915, 0.44364916731037085],
+                ]
+            )
+            quadrature_nodes = []
+            for barycentric_coordinate in barycentric_coordinates:
+                node_Q = np.sum((vertices * np.array([barycentric_coordinate]).T), axis=0)
+                quadrature_nodes.append(node_Q)
+            quadrature_nodes = np.array(quadrature_nodes)
+            quadrature_weights = np.array(
+                [
+                    [0.0771604938271605 / 1.0 * volume],
+                    #
+                    [0.1975308641975309 / 1.0 * volume],
+                    [0.1975308641975309 / 1.0 * volume],
+                    [0.1975308641975309 / 1.0 * volume],
+                    [0.1975308641975309 / 1.0 * volume],
+                    #
+                    [0.1234567901234568 / 1.0 * volume],
+                    [0.1234567901234568 / 1.0 * volume],
+                    [0.1234567901234568 / 1.0 * volume],
+                    [0.1234567901234568 / 1.0 * volume],
+                    # [[volume * 0.2777777777777778], [volume * 0.4444444444444444], [volume * 0.2777777777777778],]
                 ]
             )
         return quadrature_nodes, quadrature_weights

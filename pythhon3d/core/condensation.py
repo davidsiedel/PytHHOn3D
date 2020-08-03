@@ -3,7 +3,6 @@ from core.cell import Cell
 from core.integration import Integration
 from core.operators.operator import Operator
 from core.unknown import Unknown
-from core.element import Element
 from core.load import Load
 from core.pressure import Pressure
 from bases.basis import Basis

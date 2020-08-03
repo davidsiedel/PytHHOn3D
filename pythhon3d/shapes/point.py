@@ -26,5 +26,6 @@ class Point(Domain):
             # centroid = vertices[0]
             centroid = np.array([])
             volume = 1.0
+            diameter = 1.0
             quadrature_nodes, quadrature_weights = DunavantRule.get_point_quadrature()
-            super().__init__(centroid, volume, quadrature_nodes, quadrature_weights)
+            super().__init__(centroid, volume, diameter, quadrature_nodes, quadrature_weights)

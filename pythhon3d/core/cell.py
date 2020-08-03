@@ -36,6 +36,7 @@ class Cell(Domain):
             c = Segment(vertices, polynomial_order)
             centroid = c.centroid
             volume = c.volume
+            diameter = None
             quadrature_nodes = c.quadrature_nodes
             quadrature_weights = c.quadrature_weights
             del c
@@ -43,6 +44,7 @@ class Cell(Domain):
             c = Triangle(vertices, polynomial_order)
             centroid = c.centroid
             volume = c.volume
+            diameter = None
             quadrature_nodes = c.quadrature_nodes
             quadrature_weights = c.quadrature_weights
             del c
@@ -50,6 +52,7 @@ class Cell(Domain):
             c = Polygon(vertices, polynomial_order)
             centroid = c.centroid
             volume = c.volume
+            diameter = None
             quadrature_nodes = c.quadrature_nodes
             quadrature_weights = c.quadrature_weights
             del c
@@ -57,6 +60,7 @@ class Cell(Domain):
             c = Tetrahedron(vertices, polynomial_order)
             centroid = c.centroid
             volume = c.volume
+            diameter = None
             quadrature_nodes = c.quadrature_nodes
             quadrature_weights = c.quadrature_weights
             del c
@@ -64,10 +68,11 @@ class Cell(Domain):
             c = Polyhedron(vertices, connectivity_matrix, polynomial_order)
             centroid = c.centroid
             volume = c.volume
+            diameter = None
             quadrature_nodes = c.quadrature_nodes
             quadrature_weights = c.quadrature_weights
             del c
-        super().__init__(centroid, volume, quadrature_nodes, quadrature_weights)
+        super().__init__(centroid, volume, diameter, quadrature_nodes, quadrature_weights)
 
     @staticmethod
     def get_cell_shape(vertices: Mat) -> str:

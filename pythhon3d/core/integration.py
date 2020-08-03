@@ -186,6 +186,8 @@ class Integration:
         """
         v_f = face.volume
         x_f = face.centroid
+        v_c = cell.volume
+        x_c = cell.centroid
         # --------------------------------------------------------------------------------------------------------------
         hybrid_mass_matrix_in_face = np.zeros((cell_basis.basis_dimension, face_basis.basis_dimension))
         # --------------------------------------------------------------------------------------------------------------
@@ -196,7 +198,8 @@ class Integration:
         # --------------------------------------------------------------------------------------------------------------
         for x_Q, x_Q_in_face, w_Q in zip(face.quadrature_nodes, face_quadrature_nodes_in_face, face.quadrature_weights):
             # ----------------------------------------------------------------------------------------------------------
-            phi_vector = cell_basis.get_phi_vector(x_Q, x_f, v_f)
+            # phi_vector = cell_basis.get_phi_vector(x_Q, x_f, v_f)
+            phi_vector = cell_basis.get_phi_vector(x_Q, x_c, v_c)
             number_of_components = phi_vector.shape[0]
             phi_vector = np.resize(phi_vector, (1, number_of_components))
             # ----------------------------------------------------------------------------------------------------------

@@ -36,7 +36,7 @@ class Load:
                     load_vector_component = Integration.get_cell_load_vector_in_cell(cell, cell_basis, load_component)
                 load_vector[
                     i * cell_basis.basis_dimension : (i + 1) * cell_basis.basis_dimension
-                ] += load_vector_component
+                ] -= load_vector_component
         self.load_vector = load_vector
 
     def check_load_consistency(self, load: List[Callable], unknown: Unknown):

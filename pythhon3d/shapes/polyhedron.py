@@ -33,6 +33,7 @@ class Polyhedron(Domain):
             )
             # print(simplicial_sub_domains)
             volume = 0.0
+            diameter = None
             quadrature_nodes, quadrature_weights = [], []
             for simplicial_sub_domain in simplicial_sub_domains:
                 simplex_volume = Tetrahedron.get_tetrahedron_volume(simplicial_sub_domain)
@@ -44,7 +45,7 @@ class Polyhedron(Domain):
                 quadrature_weights.append(simplex_quadrature_weights)
             quadrature_nodes = np.concatenate(quadrature_nodes, axis=0)
             quadrature_weights = np.concatenate(quadrature_weights, axis=0)
-            super().__init__(barycenter, volume, quadrature_nodes, quadrature_weights)
+            super().__init__(barycenter, volume, diameter, quadrature_nodes, quadrature_weights)
 
     @staticmethod
     def get_polyhedron_simplicial_partition(vertices: Mat, connectivity_matrix: Mat, barycenter: Mat) -> Mat:

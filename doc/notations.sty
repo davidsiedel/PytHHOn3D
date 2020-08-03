@@ -1,0 +1,167 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{test_pkg}[2014/08/21 custom_notations]
+
+% \RequirePackage{imakeidx}
+% \RequirePackage{xstring}
+% \RequirePackage{xcolor}
+% \definecolor{greycolour}{HTML}{525252}
+% \definecolor{sharelatexcolour}{HTML}{882B21}
+% \definecolor{mybluecolour}{HTML}{394773}
+% \newcommand{\wordcolour}{greycolour}
+% packages
+\RequirePackage{centernot}
+\RequirePackage[export]{adjustbox}
+\RequirePackage[framemethod=tikz]{mdframed}
+\RequirePackage{amsmath}
+\RequirePackage{cleveref}
+\RequirePackage{xcolor}
+\RequirePackage{lmodern}
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{babel}
+\RequirePackage{textcomp}
+\RequirePackage{ifthen}
+\RequirePackage{graphicx}
+\RequirePackage{tikz}
+\RequirePackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+% Maths operators
+\DeclareMathOperator{\Ker}{Ker}
+\DeclareMathOperator{\Ima}{Im}
+\DeclareMathOperator{\Div}{div}
+% colors
+\definecolor{grey}{RGB}{200,200,200}
+\definecolor{green}{RGB}{0,200,0}
+% environments
+\newenvironment{defbox}[1]{\begin{tcolorbox}[enhanced, attach boxed title to top left={ yshifttext=-1mm, xshift=3.mm }, colback=white, colframe=grey, fonttitle=\bfseries, coltitle=black, title=Definition $:$ {#1}, boxed title style={size=small,colback=white,colframe=white}]}{\end{tcolorbox}}
+
+\newenvironment{theorembox}[1]{\begin{tcolorbox}[colback=white,colframe=grey,fonttitle=\bfseries,title=Theorem $:$ {#1}, coltitle=black]}{\end{tcolorbox}}
+
+\newenvironment{infobox}[1]{\begin{tcolorbox}[fonttitle=\bfseries,title={{Remark $:$ {#1}}}, coltitle=black, blanker, left=5.mm, right=0.cm, borderline west={1.mm}{0.cm}{grey}, breakable, overlay={\ifthenelse{\value{tcbbreakpart}=1}{}{}}]}{\end{tcolorbox}}
+
+\newmdenv[innerlinewidth=0.5pt, roundcorner=4pt,linecolor=grey,innerleftmargin=6pt, innerrightmargin=6pt,innertopmargin=6pt,innerbottommargin=6pt]{mybox}
+
+\newcommand{\tens}[1]{\oalign{\mbox{\boldmath$#1$}\crcr\hidewidth$\scriptscriptstyle\sim$\hidewidth}}
+
+\newcommand{\tenss}[1]{\oalign{\mbox{$#1$}\crcr\hidewidth$\scriptscriptstyle\sim$\hidewidth}}
+
+\newcommand{\vect}[1]{\mbox{\boldmath$\underline{#1}$}}
+
+\newcommand{\llbracket}{[\!\![}
+
+\newcommand{\rrbracket}{]\!\!]}
+
+\newcommand{\scal}[1]{\mbox{\boldmath$#1$}}
+
+\newcommand{\tenq}[1]{\oalign{\mbox{\boldmath$#1$}\crcr\hidewidth$\scriptscriptstyle\approx$\hidewidth}}
+
+\newcommand{\tenqq}[1]{\oalign{\mbox{$#1$}\crcr\hidewidth$\scriptscriptstyle\approx$\hidewidth}}
+
+\newcommand{\vectT}[1]{\vect{#1}_T}
+
+\newcommand{\vectdT}[1]{\vect{#1}_{\partial T}}
+
+\newcommand{\tensT}[1]{\tens{#1}_T}
+
+\newcommand{\tensdT}[1]{\tens{#1}_{\partial T}}
+
+
+\newcommand{\vectTko}[1]{\vect{#1}_T^{k}}
+
+\newcommand{\vectdTko}[1]{\vect{#1}_{\partial T}^{k}}
+
+\newcommand{\tensTko}[1]{\tens{#1}_T^{k}}
+
+\newcommand{\tensdTko}[1]{\tens{#1}_{\partial T}^{k}}
+
+\newcommand{\vectTki}[1]{\vect{#1}_T^{k+1}}
+
+\newcommand{\vectdTki}[1]{\vect{#1}_{\partial T}^{k+1}}
+
+\newcommand{\tensTki}[1]{\tens{#1}_T^{k+1}}
+
+\newcommand{\tensdTki}[1]{\tens{#1}_{\partial T}^{k+1}}
+
+\newcommand{\vectHHOkoT}[2]{\vect{#1}_T^k(\vect{#2}_T, \vect{#2}_{\partial T})}
+
+\newcommand{\vectHHOkiT}[2]{\vect{#1}_T^{k+1}(\vect{#2}_T, \vect{#2}_{\partial T})}
+
+\newcommand{\vectHHOkodT}[2]{\vect{#1}_{\partial T}^k(\vect{#2}_T, \vect{#2}_{\partial T})}
+
+\newcommand{\vectHHOkidT}[2]{\vect{#1}_{\partial T}^{k+1}(\vect{#2}_T, \vect{#2}_{\partial T})}
+
+\newcommand{\tensHHOkoT}[2]{\tens{#1}_T^k(\vect{#2}_T, \vect{#2}_{\partial T})}
+
+\newcommand{\tensHHOkiT}[2]{\tens{#1}_T^{k+1}(\vect{#2}_T, \vect{#2}_{\partial T})}
+
+\newcommand{\tensHHOkodT}[2]{\tens{#1}_{\partial T}^k(\vect{#2}_T, \vect{#2}_{\partial T})}
+
+\newcommand{\tensHHOkidT}[2]{\tens{#1}_{\partial T}^{k+1}(\vect{#2}_T, \vect{#2}_{\partial T})}
+
+\newcommand{\Mesh}{\mathcal{T}_h}
+
+\newcommand{\Rd}{\mathbb{R}^d}
+
+\newcommand{\Rdd}{\mathbb{R}^{d \times d}}
+
+\newcommand{\HMesh}{H^1(\Mesh;\mathbb{R}^d) = \big\{ \scal{u} \in L^2(\Omega;\mathbb{R}^{d}), \forall T \in \Mesh, \scal{u} \vert_T \in H^1(T;\mathbb{R}^{d}) \big\}}
+
+\newcommand{\HConformal}{H^1(\Omega;\mathbb{R}^d) = \big\{ \scal{u} \in L^2(\Omega;\mathbb{R}^{d}), \nabla \scal{u} \in L^2(\Omega;\mathbb{R}^{d}) \big\}}
+
+\newcommand{\HDivOmega}{H_{\Div}(\Omega;\mathbb{R}^d) = \big\{ \tens{P} \in L^2(\Omega;\mathbb{R}^{d \times d}), \nabla \cdot \tens{P} \in L^2(\Omega;\mathbb{R}^{d \times d}) \big\}}
+
+\newcommand{\HDivMesh}{H_{\Div}(\mathcal{T}_h;\mathbb{R}^d) = \big\{ \tens{P} \in L^2(T;\mathbb{R}^{d \times d}), \forall T \in \mathcal{T}_h, \nabla \cdot \tens{P} \vert_T \in L^2(T;\mathbb{R}^{d \times d}) \big\}}
+
+\newcommand{\FacesAll}{\mathcal{F}}
+\newcommand{\FacesT}{\mathcal{F}^T}
+\newcommand{\Facesi}{\mathcal{F}^i}
+\newcommand{\FacesD}{\mathcal{F}^D}
+\newcommand{\FacesN}{\mathcal{F}^N}
+
+\newcommand{\uCell}{\scal{u}_T}
+\newcommand{\uFace}{\scal{u}_F}
+\newcommand{\uBoundT}{\scal{u}_{\partial T}}
+
+\newcommand{\figref}[1]{\figurename~\ref{#1}}
+
+% \newcommand{\bts}[1]{{\left.#1\right|_{t}}}
+
+% \newcommand{\mts}[1]{{\left.#1\right|_{t+\theta\,\Delta\,t}}}
+
+% \newcommand{\ets}[1]{{\left.#1\right|_{t+\Delta\,t}}}
+
+% \newcommand{\current}[1]{{\left.#1\right|_{(n)}}}
+
+% \newcommand{\apre}[1]{{\left.#1\right|_{(n+1)}}}
+
+% \newcommand{\corr}[1]{{\delta\left.#1\right|_{(n)}}}
+
+% \newcommand{\transpose}[1]{{\mbox{}^{\mathop{T}}#1}}
+
+% \newcommand{\paren}[1]{{\left(#1\right)}}
+
+% \newcommand{\stensor}[1]{\underline{#1}}
+
+% \newcommand{\tensor}[1]{{\underset{\tilde{}}{#1}}}
+
+% \newcommand{\mn}[1]{\mathbf{#1}}
+
+% \newcommand{\Frac}[2]{{{\displaystyle \frac{\displaystyle#1}{\displaystyle#2}}}}
+
+% \newcommand{\dtot}{{{\mathrm{d}}}}
+
+% \newcommand{\deriv}[2]{{\displaystyle \frac{\displaystyle \partial#1}{\displaystyle \partial#2}}}
+
+% \newcommand{\derivtot}[2]{{\displaystyle \frac{\dtot#1}{\dtot#2}}}
+
+% \newcommand{\jump}[1]{\left[#1\right]}
+
+% \newcommand{\gj}{g^{\jump{\vec{u}}}}
+
+% \newcommand{\Gj}{\mn{G}^{\jump{\vec{u}}}}
+
+% \newcommand{\cell}[1]{#1^{(T)}}
+
+% \newcommand{\face}[1]{#1^{(\partial T)}}
+
+% \newcommand{\numberedface}[2]{#1^{(f_{#2})}}

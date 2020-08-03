@@ -34,9 +34,6 @@ class HDG(Operator):
         # --------------------------------------------------------------------------------------------------------------
         # Initializing the local gradient operator matrix
         # --------------------------------------------------------------------------------------------------------------
-        # gradient_output_dimension = len(unknown.indices) * cell_basis.basis_dimension
-        # gradient_input_dimension = local_problem_size
-        # local_gradient_operator = np.zeros((gradient_input_dimension, gradient_output_dimension))
         local_gradient_operator = np.zeros((len(unknown.indices) * cell_basis.basis_dimension, local_problem_size))
         # --------------------------------------------------------------------------------------------------------------
         # Initializing the local stabilization form matrix
@@ -48,6 +45,7 @@ class HDG(Operator):
         # --------------------------------------------------------------------------------------------------------------
         m_phi_phi_cell = Integration.get_cell_mass_matrix_in_cell(cell, cell_basis)
         m_phi_phi_cell_inv = np.linalg.inv(m_phi_phi_cell)
+        print("m_phi_phi_cell : \n{}".format(m_phi_phi_cell))
         # --------------------------------------------------------------------------------------------------------------
         # Listing the field directions and derivative directions
         # --------------------------------------------------------------------------------------------------------------
@@ -55,6 +53,7 @@ class HDG(Operator):
         directions = range(unknown.field_dimension)
         for j in derivative_directions:
             m_phi_grad_phi_cell = Integration.get_cell_advection_matrix_in_cell(cell, cell_basis, j)
+            # print("m_phi_grad_phi_cell : \n{}".format(m_phi_grad_phi_cell))
             for i in directions:
                 # ------------------------------------------------------------------------------------------------------
                 # Getting the line in the gradient operator for the derivative of the field on the ith axis along the
@@ -81,10 +80,12 @@ class HDG(Operator):
                     passmat = Operator.get_face_passmat(cell, face)
                     m_phi_phi_face = Integration.get_cell_mass_matrix_in_face(cell, face, cell_basis)
                     m_psi_psi_face = Integration.get_face_mass_matrix_in_face(face, face_basis, passmat)
+                    # print("m_phi_phi_face : \n{}".format(m_phi_phi_face))
                     m_psi_psi_face_inv = np.linalg.inv(m_psi_psi_face)
                     m_phi_psi_face = Integration.get_hybrid_mass_matrix_in_face(
                         cell, face, cell_basis, face_basis, passmat
                     )
+                    # print("m_phi_psi_face : \n{}".format(m_phi_psi_face))
                     # --------------------------------------------------------------------------------------------------
                     # Getting the indices corresponding to the face_indexth face for the field on the ith axis
                     # --------------------------------------------------------------------------------------------------
@@ -102,7 +103,9 @@ class HDG(Operator):
                     # Writing the field jump contribution in the gradient operator
                     # --------------------------------------------------------------------------------------------------
                     local_gradient_operator[l0:l1, c0:c1] -= m_phi_phi_face
-                    local_gradient_operator[l0:l1, f0:f1] += m_phi_psi_face
+                    normal_vector_component = passmat[-1, j]
+                    local_gradient_operator[l0:l1, f0:f1] += normal_vector_component * m_phi_psi_face
+                    # local_gradient_operator[l0:l1, f0:f1] += m_phi_psi_face
                     # --------------------------------------------------------------------------------------------------
                     # Writing the face contribution in the stabilization form
                     # --------------------------------------------------------------------------------------------------
@@ -111,7 +114,18 @@ class HDG(Operator):
                     m_stab_face = np.zeros((face_basis.basis_dimension, local_problem_size))
                     m_stab_face[:, c0:c1] -= m_cell_face_projection
                     m_stab_face[:, f0:f1] += m_face_id
-                    local_stabilization_form += m_stab_face.T @ m_psi_psi_face_inv @ m_stab_face
+                    h_f = 1.0 / face.diameter
+                    local_stabilization_form += h_f * m_stab_face.T @ m_psi_psi_face_inv @ m_stab_face
+                    # print("local_stabilization_form : \n{}".format(local_stabilization_form))
+                    # --------------------------------------------------------------------------------------------------
+                if unknown.symmetric_gradient and not i == j:
+                    coef = 1.0 / 2.0
+                else:
+                    coef = 1.0
+                print("coef : {}".format(coef))
+                local_gradient_operator[l0:l1, :] = coef * m_phi_phi_cell_inv @ local_gradient_operator[l0:l1, :]
+                # print("m_stab_face : \n{}".format(m_stab_face))
+        # print("local_gradient_operator : \n{}".format(local_gradient_operator))
         super().__init__(local_gradient_operator, local_stabilization_form, local_mass_operator)
 
     def get_line_from_indices(self, i: int, j: int, unknown: Unknown) -> int:
@@ -131,6 +145,6 @@ class HDG(Operator):
         for line, index in enumerate(unknown.indices):
             if index[0] == i and index[1] == j:
                 return line
-            else:
-                pass
+            if unknown.symmetric_gradient and index[0] == j and index[1] == i:
+                return line
         raise ValueError("ATtention")

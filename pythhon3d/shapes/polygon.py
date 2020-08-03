@@ -4,6 +4,7 @@ from shapes.triangle import Triangle
 from numpy import ndarray as Mat
 
 import numpy as np
+from scipy.special import binom
 
 
 class Polygon(Domain):
@@ -47,9 +48,10 @@ class Polygon(Domain):
             # number_of_vertices = vertices.shape[0]
             # centroid = 1.0 / number_of_vertices * centroid
             centroid = Polygon.get_polygon_centroid(vertices, volume)
+            diameter = Polygon.get_polygon_diameter(vertices)
             quadrature_nodes = np.concatenate(quadrature_nodes, axis=0)
             quadrature_weights = np.concatenate(quadrature_weights, axis=0)
-            super().__init__(centroid, volume, quadrature_nodes, quadrature_weights)
+            super().__init__(centroid, volume, diameter, quadrature_nodes, quadrature_weights)
 
     @staticmethod
     def get_polygon_simplicial_partition(vertices: Mat, centroid: Mat) -> Mat:
@@ -150,3 +152,33 @@ class Polygon(Domain):
         # --------------------------------------------------------------------------------------------------------------
         polygon_centroid = np.array([polygon_centroid_x, polygon_centroid_y])
         return polygon_centroid
+
+    @staticmethod
+    def get_polygon_diameter(vertices: Mat) -> float:
+        """
+        ================================================================================================================
+        Description :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Parameters :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Exemple :
+        ================================================================================================================
+    
+        """
+        number_of_vertices = vertices.shape[0]
+        number_of_combinations = binom(number_of_vertices, 2)
+        # --------------------------------------------------------------------------------------------------------------
+        combinations_count = 0
+        lengths = []
+        for i, v0 in enumerate(vertices):
+            for j, v1 in enumerate(vertices):
+                # if not i == j and not permutation_count == number_of_combinations:
+                if not i == j:
+                    e = v1 - v0
+                    lengths.append(np.sqrt((e[1] + e[0]) ** 2))
+        diameter = max(lengths)
+        return diameter

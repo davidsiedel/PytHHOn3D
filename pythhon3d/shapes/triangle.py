@@ -26,10 +26,11 @@ class Triangle(Domain):
         else:
             centroid = Domain.get_domain_barycenter_vector(vertices)
             volume = Triangle.get_triangle_volume(vertices)
+            diameter = Triangle.get_triangle_diameter(vertices)
             quadrature_nodes, quadrature_weights = DunavantRule.get_triangle_quadrature(
                 vertices, volume, polynomial_order
             )
-            super().__init__(centroid, volume, quadrature_nodes, quadrature_weights)
+            super().__init__(centroid, volume, diameter, quadrature_nodes, quadrature_weights)
 
     @staticmethod
     def get_triangle_volume(vertices: Mat) -> float:
@@ -52,3 +53,25 @@ class Triangle(Domain):
         triangle_edges = (vertices - triangle_origin_vertex_vector)[1:]
         triangle_volume = np.abs(1.0 / 2.0 * np.linalg.det(triangle_edges))
         return triangle_volume
+
+    @staticmethod
+    def get_triangle_diameter(vertices: Mat) -> float:
+        """
+        ================================================================================================================
+        Description :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Parameters :
+        ================================================================================================================
+        
+        ================================================================================================================
+        Exemple :
+        ================================================================================================================
+    
+        """
+        shape_dimension = 2
+        triangle_origin_vertex_vector = np.tile(vertices[0], (shape_dimension + 1, 1))
+        triangle_edges = (vertices - triangle_origin_vertex_vector)[1:]
+        triangle_diameter = max([np.sqrt((e[1] + e[0]) ** 2) for e in triangle_edges])
+        return triangle_diameter

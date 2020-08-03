@@ -31,29 +31,29 @@ class Unknown:
         """
         if problem_dimension == field_dimension:
             if not symmetric_gradient:
-                if field_dimension == 1:
+                if problem_dimension == 1:
                     indices = [(0, 0)]
-                elif field_dimension == 2:
+                elif problem_dimension == 2:
                     indices = [(0, 0), (1, 1), (0, 1), (1, 0)]
-                elif field_dimension == 3:
+                elif problem_dimension == 3:
                     indices = [(0, 0), (1, 1), (2, 2), (1, 2), (0, 2), (0, 1), (2, 1), (2, 0), (1, 0)]
                 else:
                     raise ValueError("the field_dimension is not correct")
             else:
-                if field_dimension == 1:
+                if problem_dimension == 1:
                     indices = [(0, 0)]
-                elif field_dimension == 2:
+                elif problem_dimension == 2:
                     indices = [(0, 0), (1, 1), (0, 1)]
-                elif field_dimension == 3:
+                elif problem_dimension == 3:
                     indices = [(0, 0), (1, 1), (2, 2), (1, 2), (0, 2), (0, 1)]
                 else:
                     raise ValueError("the field_dimension is not correct")
         elif problem_dimension > field_dimension:
-            if field_dimension == 1:
+            if problem_dimension == 1:
                 indices = [(0, 0)]
-            elif field_dimension == 2:
+            elif problem_dimension == 2:
                 indices = [(0, 0), (0, 1)]
-            elif field_dimension == 3:
+            elif problem_dimension == 3:
                 indices = [(0, 0), (0, 1), (0, 2)]
             else:
                 raise ValueError("the field_dimension is not correct")

@@ -26,10 +26,11 @@ class Segment(Domain):
         else:
             centroid = Domain.get_domain_barycenter_vector(vertices)
             volume = Segment.get_segment_volume(vertices)
+            diameter = volume
             quadrature_nodes, quadrature_weights = DunavantRule.get_segment_quadrature(
                 vertices, volume, polynomial_order
             )
-            super().__init__(centroid, volume, quadrature_nodes, quadrature_weights)
+            super().__init__(centroid, volume, diameter, quadrature_nodes, quadrature_weights)
 
     @staticmethod
     def get_segment_volume(vertices: Mat) -> float:
