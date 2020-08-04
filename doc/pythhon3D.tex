@@ -5,29 +5,144 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 
+% ======================================================================================================================
+% NOTATIONS
+% ======================================================================================================================
+
+\newcommand{\Hdiv}{
+  H^1_{div}(\Omega; \mathbb{R}^{d \times d})
+}
+
+\newcommand{\Hone}{
+  H^{1}(\Omega; \mathbb{R}^{d})
+}
+
+\newcommand{\Fv}{
+  \tensori{f} \subscript{v}
+}
+
+\newcommand{\Tn}{
+  \tensori{t} \subscript{n}
+}
+
+\newcommand{\PK}{
+  \tensorii{\pi} \subscript{1}
+}
+
+% ======================================================================================================================
+% NOTATIONS
+% ======================================================================================================================
+
 % \setlength{\mathindent}{0pt}
 \setlength{\parindent}{0em}
 \setlength{\parskip}{0em}
 
 \title{\texttt{PytHHOn3D} documentation}
-% \author{David Siedel \and Olivier Fandeur \and  Thomas Helfer}
+\author{David Siedel \and Olivier Fandeur \and  Thomas Helfer}
 
 \date{01/08/2020}
+
+
+% ======================================================================================================================
+% DOCUMENT
+% ======================================================================================================================
 
 \begin{document}
 
   \maketitle
   
   \section{Introduction}
-      The \texttt{PytHHOn3D} library is a 
+      The \texttt{PytHHOn3D} library is a PDE solver implementing the HHO method in a generic and object-oriented fashion using \texttt{python}, with specific applications to solid mechanics : the structure of the code follows that of a usual FEM solver, namely :
+      \begin{itemize}
+        \item \texttt{PytHHOn3D} reads and parses a mesh file as input
+        \item it takes a set of input data to set the PDE problem to solve (boundary conditions, volumetric forces, HHO elements characteristics)
+        \item \texttt{PytHHOn3D} builds the framework specific to HHO methods, and the HHO element for each element in the mesh
+        \item it solves a linear system given a set of fourth order tensors (one for each element) as tangent matrices
+        \item it returns the unknown values at vertices and quadrature points
+      \end{itemize}
 
-  \section{Formal setting}
+  \newpage
 
-      Let $\Omega$ a domain in $\Rd$ with Lipschitz boundaries.
-      Let $\HConformal$ the usual functional space on $\Omega$.
-      Let $\Mesh$ a mesh of $\Omega$ and $\HMesh$ the usual functional space on $\Mesh$
+  \section{Model problem : small strain linear elasticity}
 
-    \paragraph{One dimensional problem}
+    \paragraph{Problem setting}
+
+      Let $\Omega$ a domain in $\Rd$ with Lipschitz boundaries $\partial \Omega$. Let the following regular functional spaces :
+
+      \begin{defbox}{Sobolev space}
+        $\Hone = \big\{ \tensori{u} \in L^2(\Omega;\mathbb{R}^{d}), \nabla \tensori{u} \in L^2(\Omega;\mathbb{R}^{d \times d}) \big\}$
+      \end{defbox}
+
+      \begin{defbox}{Divergence Sobolev space}
+        $\Hdiv = \big\{ \tensorii{\tau} \in L^2(\Omega;\mathbb{R}^{d \times d}), \nabla \cdot \tensorii{\tau} \in L^2(\Omega;\mathbb{R}^{d}) \big\}$
+      \end{defbox}
+
+      % Let the Poisson problem :
+
+      % \begin{equation}
+      %   \begin{cases}
+      %     \Delta \tensori{u} = \tensori{f} & \mbox{in } \Omega
+      %     \\
+      %     \nabla \tensori{u} = \tensori{t} \cdot \tensori{n} & \mbox{on } \partial \Omega_N
+      %     \\
+      %     \tensori{u} = \tensori{u} \subscript{d} & \mbox{on } \partial \Omega_D
+      %   \end{cases}
+      %   \label{eq_poisson}
+      % \end{equation}
+
+    \paragraph{Problem}
+
+      Let the small strain linear elastic problem for $\tensori{u}$ such that:
+
+      \begin{equation}
+        \begin{cases}
+          \nabla \cdot \tensorii{\sigma} = -\tensori{f} & \mbox{in } \Omega
+          \\
+          \tensorii{\sigma} = \tensori{t} \cdot \tensori{n} & \mbox{on } \partial \Omega_N
+          \\
+          \tensori{u} = \tensori{u} \subscript{D} & \mbox{on } \partial \Omega_D
+          \\
+          \tensorii{\sigma} = 2 \mu \tensorii{\varepsilon} + \lambda \Tr (\tensorii{\varepsilon}) = \tensoriv{\mathbb{C}} : \tensorii{\varepsilon} & \mbox{in } \Omega
+          \\
+          \tensorii{\varepsilon} = \frac{1}{2}(\nabla \tensori{u} + \nabla^T \tensori{u}) = \nabla^s \tensori{u} & \mbox{in } \Omega
+        \end{cases}
+        \label{eq_linear_elastic}
+      \end{equation}
+      
+      Where
+
+      \begin{itemize}
+        \item $\tensorii{\sigma} \in \Hdiv$ is the symmetric Cauchy stress tensor
+        \item $\tensori{u} \in \Hone$ is the displacement field
+        \item $\tensori{t} \in \Hone$ are the applied forces
+        \item $\tensori{u} \subscript{D} \in \Hone$ is the imposed displacement
+        \item $\lambda$ and $\mu$ are Lamé coefficients of the material
+      \end{itemize}
+
+    \paragraph{Weak form}
+
+      The weak form of \eqref{eq_linear_elastic} reads as the Principle of Virtual Works :
+
+      \begin{theorembox}{Principle of Virtual Works (PVW)}
+        find $\tensori{u} \in \Hone$ such that : 
+        \begin{equation}
+          \begin{cases}
+            \displaystyle
+            \int_{\Omega} \tensorii{\sigma} : \nabla^s \tensori{v} = \int_{\Omega} \tensori{f} \cdot \tensori{v} + \int_{\partial \Omega_N} \tensori{t} \cdot \tensori{v} &  \forall \tensori{v} \in \Hone
+            \\
+            \tensori{u} = \tensori{u} \subscript{D} & \mbox{on } \partial \Omega_D
+          \end{cases}
+        \end{equation}
+        \label{eq_pvw}
+      \end{theorembox}
+
+    \paragraph{Discretization : the Finite Element Method (FEM)}
+
+      The FEM method consists in descretizing \eqref{eq_pvw} in both physical and functional spaces through Lagrange polynbomials bases : defining the usual shape functions, that are polynomials of a given order $k_c$, such that they are of value $1$ at a given node and $0$ elsewhere in $\Omega$, one can put \eqref{eq_pvw} in a matricial form, which enables to find an approximation of $\tensori{u}$ in \eqref{eq_pvw} numerically.
+    
+    \paragraph{Polynomial approximation}
+
+      Let $\mathbb{P}^{k_c}(\Omega;\mathbb{R}^d) \subset \Hone$ a polynomial space of order $k_c$. Let $N_k^d$ the dimension of $\mathbb{P}^{k_c}(\Omega;\mathbb{R}^d)$, and $(\tensori{\phi}\subscript{m})_{m \leq N_{k_c}^d}$ a basis of $\mathbb{P}^{k_c}(\Omega;\mathbb{R}^d)$. $N_k^d$ is then the number of vectors $\tensori{\phi}\subscript{m}$ composing 
 
     \bibliographystyle{unsrt}
 

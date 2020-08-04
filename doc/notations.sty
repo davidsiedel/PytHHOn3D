@@ -1,14 +1,29 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{test_pkg}[2014/08/21 custom_notations]
+\ProvidesPackage{notations}[2014/08/21 custom_notations]
 
-% \RequirePackage{imakeidx}
-% \RequirePackage{xstring}
+% ======================================================================================================================
+% IMPORTS
+% ======================================================================================================================
+
+% \RequirePackage{centernot}
+% \RequirePackage[export]{adjustbox}
+% \RequirePackage[framemethod=tikz]{mdframed}
+% \RequirePackage{amsmath}
+% \RequirePackage{cleveref}
 % \RequirePackage{xcolor}
-% \definecolor{greycolour}{HTML}{525252}
-% \definecolor{sharelatexcolour}{HTML}{882B21}
-% \definecolor{mybluecolour}{HTML}{394773}
-% \newcommand{\wordcolour}{greycolour}
-% packages
+% \RequirePackage{lmodern}
+% \RequirePackage[T1]{fontenc}
+% \RequirePackage[utf8]{inputenc}
+% \RequirePackage{babel}
+% \RequirePackage{textcomp}
+% \RequirePackage{ifthen}
+% \RequirePackage{graphicx}
+% \RequirePackage{tikz}
+% \RequirePackage{tcolorbox}
+% \RequirePackage{bm}
+% \RequirePackage{stackengine}
+% \tcbuselibrary{skins,breakable}
+
 \RequirePackage{centernot}
 \RequirePackage[export]{adjustbox}
 \RequirePackage[framemethod=tikz]{mdframed}
@@ -24,93 +39,119 @@
 \RequirePackage{graphicx}
 \RequirePackage{tikz}
 \RequirePackage{tcolorbox}
+\RequirePackage{bm}
+\RequirePackage{stackengine}
 \tcbuselibrary{skins,breakable}
-% Maths operators
+
+% ======================================================================================================================
+% MATHS OPERATORS
+% ======================================================================================================================
+
 \DeclareMathOperator{\Ker}{Ker}
 \DeclareMathOperator{\Ima}{Im}
 \DeclareMathOperator{\Div}{div}
-% colors
+\DeclareMathOperator{\Tr}{Tr}
+
+% ======================================================================================================================
+% COLORS
+% ======================================================================================================================
+
 \definecolor{grey}{RGB}{200,200,200}
 \definecolor{green}{RGB}{0,200,0}
-% environments
-\newenvironment{defbox}[1]{\begin{tcolorbox}[enhanced, attach boxed title to top left={ yshifttext=-1mm, xshift=3.mm }, colback=white, colframe=grey, fonttitle=\bfseries, coltitle=black, title=Definition $:$ {#1}, boxed title style={size=small,colback=white,colframe=white}]}{\end{tcolorbox}}
 
-\newenvironment{theorembox}[1]{\begin{tcolorbox}[colback=white,colframe=grey,fonttitle=\bfseries,title=Theorem $:$ {#1}, coltitle=black]}{\end{tcolorbox}}
+% ======================================================================================================================
+% ENVIRONMENTS
+% ======================================================================================================================
 
-\newenvironment{infobox}[1]{\begin{tcolorbox}[fonttitle=\bfseries,title={{Remark $:$ {#1}}}, coltitle=black, blanker, left=5.mm, right=0.cm, borderline west={1.mm}{0.cm}{grey}, breakable, overlay={\ifthenelse{\value{tcbbreakpart}=1}{}{}}]}{\end{tcolorbox}}
+\newenvironment{defbox}[1]{
+    \begin{tcolorbox}[enhanced, attach boxed title to top left={ yshifttext=-1mm, xshift=3.mm }, colback=white, colframe=grey, fonttitle=\bfseries, coltitle=black, title=Definition $:$ {#1}, boxed title style={size=small,colback=white,colframe=white}]}{\end{tcolorbox}
+}
+
+\newenvironment{theorembox}[1]{
+    \begin{tcolorbox}[colback=white,colframe=grey,fonttitle=\bfseries,title=Theorem $:$ {#1}, coltitle=black]}{\end{tcolorbox}
+}
+
+\newenvironment{infobox}[1]{
+    \begin{tcolorbox}[fonttitle=\bfseries,title={{Remark $:$ {#1}}}, coltitle=black, blanker, left=5.mm, right=0.cm, borderline west={1.mm}{0.cm}{grey}, breakable, overlay={\ifthenelse{\value{tcbbreakpart}=1}{}{}}]}{\end{tcolorbox}
+}
 
 \newmdenv[innerlinewidth=0.5pt, roundcorner=4pt,linecolor=grey,innerleftmargin=6pt, innerrightmargin=6pt,innertopmargin=6pt,innerbottommargin=6pt]{mybox}
 
-\newcommand{\tens}[1]{\oalign{\mbox{\boldmath$#1$}\crcr\hidewidth$\scriptscriptstyle\sim$\hidewidth}}
+% ======================================================================================================================
+% DIVERS
+% ======================================================================================================================
 
-\newcommand{\tenss}[1]{\oalign{\mbox{$#1$}\crcr\hidewidth$\scriptscriptstyle\sim$\hidewidth}}
+\newcommand{\subscript}[1]{
+    {}_{#1}
+}
 
-\newcommand{\vect}[1]{\mbox{\boldmath$\underline{#1}$}}
+\newcommand{\supscript}[1]{
+    {}^{#1}
+}
+
+\newcommand{\subsuppscript}[2]{
+    {}_{#1}^{#2}
+}
+
+% ======================================================================================================================
+% TENSORIAL NOTATIONS
+% ======================================================================================================================
+
+\newcommand{\tensoro}[1]{
+    \bm{#1}
+}
+
+\newcommand{\tensori}[1]{
+    {\stackunder[-1.5pt]{${\bm{#1}}$}{$-$}}
+}
+
+\newcommand{\tensorii}[1]{
+    {\stackunder[1.2pt]{${\bm{#1}}$}{$\scriptstyle \sim$}}
+}
+
+\newcommand{\tensoriv}[1]{
+    {\stackunder[1.2pt]{${\bm{#1}}$}{$\scriptstyle \approx$}}
+}
+
+% ======================================================================================================================
+% SCALARS, VECTORS, TENSORS
+% ======================================================================================================================
 
 \newcommand{\llbracket}{[\!\![}
 
 \newcommand{\rrbracket}{]\!\!]}
 
-\newcommand{\scal}[1]{\mbox{\boldmath$#1$}}
+% ======================================================================================================================
+% TEXT NOTATIONS, FUNCTIONAL SPACES, MESHES
+% ======================================================================================================================
 
-\newcommand{\tenq}[1]{\oalign{\mbox{\boldmath$#1$}\crcr\hidewidth$\scriptscriptstyle\approx$\hidewidth}}
+\newcommand{\Mesh}{
+    \mathcal{T}_h
+}
 
-\newcommand{\tenqq}[1]{\oalign{\mbox{$#1$}\crcr\hidewidth$\scriptscriptstyle\approx$\hidewidth}}
+\newcommand{\Rd}{
+    \mathbb{R}^d
+}
 
-\newcommand{\vectT}[1]{\vect{#1}_T}
+\newcommand{\Rdd}{
+    \mathbb{R}^{d \times d}
+}
 
-\newcommand{\vectdT}[1]{\vect{#1}_{\partial T}}
+\newcommand{\HMesh}{
+    H^1(\Mesh;\mathbb{R}^d) = \big\{ \tensori{u} \in L^2(\Omega;\mathbb{R}^{d}), \forall T \in \Mesh, \tensori{u} \vert_T \in H^1(T;\mathbb{R}^{d}) \big\}
+}
 
-\newcommand{\tensT}[1]{\tens{#1}_T}
+\newcommand{\HConformal}{
+    H^1(\Omega;\mathbb{R}^d) = \big\{ \tensori{u} \in L^2(\Omega;\mathbb{R}^{d}), \nabla \tensori{u} \in L^2(\Omega;\mathbb{R}^{d \times d}) \big\}
+}
 
-\newcommand{\tensdT}[1]{\tens{#1}_{\partial T}}
+\newcommand{\HDivOmega}{
+    H_{\Div}(\Omega;\mathbb{R}^d) = \big\{ \tensorii{P} \in L^2(\Omega;\mathbb{R}^{d \times d}), \nabla \cdot \tensorii{P} \in L^2(\Omega;\mathbb{R}^{d \times d}) \big\}
+}
 
-
-\newcommand{\vectTko}[1]{\vect{#1}_T^{k}}
-
-\newcommand{\vectdTko}[1]{\vect{#1}_{\partial T}^{k}}
-
-\newcommand{\tensTko}[1]{\tens{#1}_T^{k}}
-
-\newcommand{\tensdTko}[1]{\tens{#1}_{\partial T}^{k}}
-
-\newcommand{\vectTki}[1]{\vect{#1}_T^{k+1}}
-
-\newcommand{\vectdTki}[1]{\vect{#1}_{\partial T}^{k+1}}
-
-\newcommand{\tensTki}[1]{\tens{#1}_T^{k+1}}
-
-\newcommand{\tensdTki}[1]{\tens{#1}_{\partial T}^{k+1}}
-
-\newcommand{\vectHHOkoT}[2]{\vect{#1}_T^k(\vect{#2}_T, \vect{#2}_{\partial T})}
-
-\newcommand{\vectHHOkiT}[2]{\vect{#1}_T^{k+1}(\vect{#2}_T, \vect{#2}_{\partial T})}
-
-\newcommand{\vectHHOkodT}[2]{\vect{#1}_{\partial T}^k(\vect{#2}_T, \vect{#2}_{\partial T})}
-
-\newcommand{\vectHHOkidT}[2]{\vect{#1}_{\partial T}^{k+1}(\vect{#2}_T, \vect{#2}_{\partial T})}
-
-\newcommand{\tensHHOkoT}[2]{\tens{#1}_T^k(\vect{#2}_T, \vect{#2}_{\partial T})}
-
-\newcommand{\tensHHOkiT}[2]{\tens{#1}_T^{k+1}(\vect{#2}_T, \vect{#2}_{\partial T})}
-
-\newcommand{\tensHHOkodT}[2]{\tens{#1}_{\partial T}^k(\vect{#2}_T, \vect{#2}_{\partial T})}
-
-\newcommand{\tensHHOkidT}[2]{\tens{#1}_{\partial T}^{k+1}(\vect{#2}_T, \vect{#2}_{\partial T})}
-
-\newcommand{\Mesh}{\mathcal{T}_h}
-
-\newcommand{\Rd}{\mathbb{R}^d}
-
-\newcommand{\Rdd}{\mathbb{R}^{d \times d}}
-
-\newcommand{\HMesh}{H^1(\Mesh;\mathbb{R}^d) = \big\{ \scal{u} \in L^2(\Omega;\mathbb{R}^{d}), \forall T \in \Mesh, \scal{u} \vert_T \in H^1(T;\mathbb{R}^{d}) \big\}}
-
-\newcommand{\HConformal}{H^1(\Omega;\mathbb{R}^d) = \big\{ \scal{u} \in L^2(\Omega;\mathbb{R}^{d}), \nabla \scal{u} \in L^2(\Omega;\mathbb{R}^{d}) \big\}}
-
-\newcommand{\HDivOmega}{H_{\Div}(\Omega;\mathbb{R}^d) = \big\{ \tens{P} \in L^2(\Omega;\mathbb{R}^{d \times d}), \nabla \cdot \tens{P} \in L^2(\Omega;\mathbb{R}^{d \times d}) \big\}}
-
-\newcommand{\HDivMesh}{H_{\Div}(\mathcal{T}_h;\mathbb{R}^d) = \big\{ \tens{P} \in L^2(T;\mathbb{R}^{d \times d}), \forall T \in \mathcal{T}_h, \nabla \cdot \tens{P} \vert_T \in L^2(T;\mathbb{R}^{d \times d}) \big\}}
+\newcommand{\HDivMesh}{
+    H_{\Div}(\mathcal{T}_h;\mathbb{R}^d) = \big\{ \tensorii{P} \in L^2(T;\mathbb{R}^{d \times d}), \forall T \in \mathcal{T}_h, \nabla \cdot \tensorii{P} \vert_T \in L^2(T;\mathbb{R}^{d \times d}) \big\}
+}
 
 \newcommand{\FacesAll}{\mathcal{F}}
 \newcommand{\FacesT}{\mathcal{F}^T}
@@ -118,9 +159,9 @@
 \newcommand{\FacesD}{\mathcal{F}^D}
 \newcommand{\FacesN}{\mathcal{F}^N}
 
-\newcommand{\uCell}{\scal{u}_T}
-\newcommand{\uFace}{\scal{u}_F}
-\newcommand{\uBoundT}{\scal{u}_{\partial T}}
+\newcommand{\uCell}{\tensori{u}\subscript{T}}
+\newcommand{\uFace}{\tensori{u}\subscriptF}
+\newcommand{\uBoundT}{\tensori{u}\subscript{\partial T}}
 
 \newcommand{\figref}[1]{\figurename~\ref{#1}}
 
