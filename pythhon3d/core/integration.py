@@ -248,47 +248,47 @@ class Integration:
             face_mass_matrix_in_face += m
         return face_mass_matrix_in_face
 
-    @staticmethod
-    def get_face_displacement_vector_in_face(
-        face: Face, face_basis: Basis, face_reference_frame_transformation_matrix: Mat, displacement: Callable,
-    ) -> Mat:
-        """
-        ================================================================================================================
-        Description :
-        ================================================================================================================
-        
-        ================================================================================================================
-        Parameters :
-        ================================================================================================================
-        
-        ================================================================================================================
-        Exemple :
-        ================================================================================================================
-        
-        """
-        v_f = face.volume
-        x_f = face.centroid
-        # --------------------------------------------------------------------------------------------------------------
-        face_mass_matrix_in_face = np.zeros((face_basis.basis_dimension, face_basis.basis_dimension))
-        displacement_vector = np.zeros((face_basis.basis_dimension,))
-        # --------------------------------------------------------------------------------------------------------------
-        x_f_in_face = Face.get_points_in_face_reference_frame(face.centroid, face_reference_frame_transformation_matrix)
-        face_quadrature_nodes_in_face = Face.get_points_in_face_reference_frame(
-            face.quadrature_nodes, face_reference_frame_transformation_matrix
-        )
-        for x_Q_f_in_face, w_Q_f in zip(face_quadrature_nodes_in_face, face.quadrature_weights):
-            # ----------------------------------------------------------------------------------------------------------
-            psi_vector = face_basis.get_phi_vector(x_Q_f_in_face, x_f_in_face, v_f)
-            number_of_components = psi_vector.shape[0]
-            psi_vector = np.resize(psi_vector, (1, number_of_components))
-            # ----------------------------------------------------------------------------------------------------------
-            m = w_Q_f * psi_vector.T @ psi_vector
-            face_mass_matrix_in_face += m
-            # ----------------------------------------------------------------------------------------------------------
-            h = np.full((face_basis.basis_dimension,), displacement(x_Q_f_in_face))
-            displacement_vector += h
-        face_displacement_vector_in_face = np.linalg.inv(face_mass_matrix_in_face) @ displacement_vector.T
-        return face_displacement_vector_in_face
+    # @staticmethod
+    # def get_face_displacement_vector_in_face(
+    #     face: Face, face_basis: Basis, face_reference_frame_transformation_matrix: Mat, displacement: Callable,
+    # ) -> Mat:
+    #     """
+    #     ================================================================================================================
+    #     Description :
+    #     ================================================================================================================
+
+    #     ================================================================================================================
+    #     Parameters :
+    #     ================================================================================================================
+
+    #     ================================================================================================================
+    #     Exemple :
+    #     ================================================================================================================
+
+    #     """
+    #     v_f = face.volume
+    #     x_f = face.centroid
+    #     # --------------------------------------------------------------------------------------------------------------
+    #     face_mass_matrix_in_face = np.zeros((face_basis.basis_dimension, face_basis.basis_dimension))
+    #     displacement_vector = np.zeros((face_basis.basis_dimension,))
+    #     # --------------------------------------------------------------------------------------------------------------
+    #     x_f_in_face = Face.get_points_in_face_reference_frame(face.centroid, face_reference_frame_transformation_matrix)
+    #     face_quadrature_nodes_in_face = Face.get_points_in_face_reference_frame(
+    #         face.quadrature_nodes, face_reference_frame_transformation_matrix
+    #     )
+    #     for x_Q_f_in_face, w_Q_f in zip(face_quadrature_nodes_in_face, face.quadrature_weights):
+    #         # ----------------------------------------------------------------------------------------------------------
+    #         psi_vector = face_basis.get_phi_vector(x_Q_f_in_face, x_f_in_face, v_f)
+    #         number_of_components = psi_vector.shape[0]
+    #         psi_vector = np.resize(psi_vector, (1, number_of_components))
+    #         # ----------------------------------------------------------------------------------------------------------
+    #         m = w_Q_f * psi_vector.T @ psi_vector
+    #         face_mass_matrix_in_face += m
+    #         # ----------------------------------------------------------------------------------------------------------
+    #         h = np.full((face_basis.basis_dimension,), displacement(x_Q_f_in_face))
+    #         displacement_vector += h
+    #     face_displacement_vector_in_face = np.linalg.inv(face_mass_matrix_in_face) @ displacement_vector.T
+    #     return face_displacement_vector_in_face
 
     @staticmethod
     def get_face_pressure_vector_in_face(
@@ -323,6 +323,45 @@ class Integration:
             v = w_Q_f * psi_vector * pressure(x_Q_f_in_face)
             face_pressure_vector_in_face += v
         return face_pressure_vector_in_face
+
+    # @staticmethod
+    # def get_face_displacement_vector_in_face(
+    #     face: Face, face_basis: Basis, face_reference_frame_transformation_matrix: Mat, pressure: Callable,
+    # ) -> Mat:
+    #     """
+    #     ================================================================================================================
+    #     Description :
+    #     ================================================================================================================
+
+    #     ================================================================================================================
+    #     Parameters :
+    #     ================================================================================================================
+
+    #     ================================================================================================================
+    #     Exemple :
+    #     ================================================================================================================
+
+    #     """
+    #     v_f = face.volume
+    #     x_f = face.centroid
+    #     # --------------------------------------------------------------------------------------------------------------
+    #     face_pressure_vector_in_face = np.zeros((face_basis.basis_dimension,))
+    #     face_mass_matrix_in_face = np.zeros((face_basis.basis_dimension, face_basis.basis_dimension))
+    #     # --------------------------------------------------------------------------------------------------------------
+    #     x_f_in_face = Face.get_points_in_face_reference_frame(face.centroid, face_reference_frame_transformation_matrix)
+    #     face_quadrature_nodes_in_face = Face.get_points_in_face_reference_frame(
+    #         face.quadrature_nodes, face_reference_frame_transformation_matrix
+    #     )
+    #     for x_Q_f_in_face, w_Q_f in zip(face_quadrature_nodes_in_face, face.quadrature_weights):
+    #         # ----------------------------------------------------------------------------------------------------------
+    #         psi_vector = face_basis.get_phi_vector(x_Q_f_in_face, x_f_in_face, v_f)
+    #         v = w_Q_f * psi_vector * pressure(x_Q_f_in_face)
+    #         face_pressure_vector_in_face += v
+    #         # ----------------------------------------------------------------------------------------------------------
+    #         number_of_components = psi_vector.shape[0]
+    #         psi_vector = np.resize(psi_vector, (1, number_of_components))
+    #         face_mass_matrix_in_face += w_Q_f * psi_vector.T @ psi_vector
+    #     return face_pressure_vector_in_face
 
     @staticmethod
     def get_cell_load_vector_in_cell(cell: Cell, cell_basis: Basis, load: Callable) -> Mat:

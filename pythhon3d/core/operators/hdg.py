@@ -45,7 +45,7 @@ class HDG(Operator):
         # --------------------------------------------------------------------------------------------------------------
         m_phi_phi_cell = Integration.get_cell_mass_matrix_in_cell(cell, cell_basis)
         m_phi_phi_cell_inv = np.linalg.inv(m_phi_phi_cell)
-        print("m_phi_phi_cell : \n{}".format(m_phi_phi_cell))
+        # print("m_phi_phi_cell : \n{}".format(m_phi_phi_cell))
         # --------------------------------------------------------------------------------------------------------------
         # Listing the field directions and derivative directions
         # --------------------------------------------------------------------------------------------------------------
@@ -102,8 +102,8 @@ class HDG(Operator):
                     # --------------------------------------------------------------------------------------------------
                     # Writing the field jump contribution in the gradient operator
                     # --------------------------------------------------------------------------------------------------
-                    local_gradient_operator[l0:l1, c0:c1] -= m_phi_phi_face
                     normal_vector_component = passmat[-1, j]
+                    local_gradient_operator[l0:l1, c0:c1] -= normal_vector_component * m_phi_phi_face
                     local_gradient_operator[l0:l1, f0:f1] += normal_vector_component * m_phi_psi_face
                     # local_gradient_operator[l0:l1, f0:f1] += m_phi_psi_face
                     # --------------------------------------------------------------------------------------------------
@@ -122,7 +122,7 @@ class HDG(Operator):
                     coef = 1.0 / 2.0
                 else:
                     coef = 1.0
-                print("coef : {}".format(coef))
+                # print("coef : {}".format(coef))
                 local_gradient_operator[l0:l1, :] = coef * m_phi_phi_cell_inv @ local_gradient_operator[l0:l1, :]
                 # print("m_stab_face : \n{}".format(m_stab_face))
         # print("local_gradient_operator : \n{}".format(local_gradient_operator))

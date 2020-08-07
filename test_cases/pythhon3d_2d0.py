@@ -19,42 +19,43 @@ d = 2
 face_polynomial_order = 1
 cell_polynomial_order = 2
 field_dimension = 1
-stabilization_parameter = 1.0  # K2
+stabilization_parameter = 10.0  # K2
+# stabilization_parameter = 1000000.0  # K2
 mesh_file = "/Users/davidsiedel/Projects/PytHHOn3D/meshes/mesh2D25.geof"
+# mesh_file = "/Users/davidsiedel/Projects/PytHHOn3D/meshes/triangles_test.geof"
 operator_type = "HDG"
 #
-pressure_left = [lambda x: 0.0, lambda x: 0.0]
-pressure_right = [lambda x: 0.0, lambda x: 0.0]
-pressure_top = [lambda x: 0.0, lambda x: 0.0]
-pressure_bottom = [lambda x: 0.0, lambda x: 0.0]
+pressure_left = [lambda x: 0.0]
+pressure_right = [lambda x: 0.0]
+pressure_top = [lambda x: 0.0]
+pressure_bottom = [lambda x: 0.0]
 #
-displacement_left = [lambda x: 0.0, lambda x: 0.0]
-displacement_right = [lambda x: 0.0, lambda x: 0.0]
-displacement_right = [lambda x: 0.0, lambda x: 0.0]
-displacement_top = [lambda x: 0.0, lambda x: 0.0]
-displacement_bottom = [lambda x: 0.0, lambda x: 0.0]
+displacement_left = [None]
+displacement_right = [None]
+displacement_top = [lambda x: 1.0]
+displacement_bottom = [lambda x: 0.0]
 #
-load = [
-    lambda x: np.sin(2.0 * np.pi * x[0]) * np.sin(2.0 * np.pi * x[1]),
-    lambda x: np.sin(2.0 * np.pi * x[0]) * np.sin(2.0 * np.pi * x[1]),
-]
-#
+
 lam = 10.0
 load = [
     lambda x: (0.2 * np.sin(2.0 * np.pi * x[1])) * (np.cos(2.0 * np.pi * x[0]) - 1.0)
-    + (np.sin(2.0 * np.pi * x[0]) * np.sin(2.0 * np.pi * x[1])) / (5.0 + 5.0 * lam),
-    lambda x: (-0.2 * np.sin(2.0 * np.pi * x[1])) * (np.cos(2.0 * np.pi * x[0]) - 1.0)
     + (np.sin(2.0 * np.pi * x[0]) * np.sin(2.0 * np.pi * x[1])) / (5.0 + 5.0 * lam),
 ]
 #
 load = [
     lambda x: 6.0 * x[0] * x[1] * (1.0 - x[1]) - 2.0 * x[0] ** 3,
-    lambda x: 0.0,
 ]
 #
 load = [
-    lambda x: 1.0,
-    lambda x: 0.0,
+    lambda x: -0.0,
+]
+#
+load = [
+    lambda x: np.sin(2.0 * np.pi * x[0]) * np.sin(2.0 * np.pi * x[1]),
+]
+#
+load = [
+    lambda x: -10.0,
 ]
 #
 boundary_conditions = {
@@ -73,15 +74,21 @@ boundary_conditions = {
     cells_vertices_connectivity_matrix,
     faces_vertices_connectivity_matrix,
     nsets,
+    flags,
     cell_basis,
     face_basis,
     unknown,
 ) = build(mesh_file, field_dimension, face_polynomial_order, cell_polynomial_order, operator_type)
 # ------------------------------------------------------------------------------------------------------------------
 d = unknown.problem_dimension
-tangent_matrices = [np.eye(d ** 2) for i in range(len(cells))]
+tangent_matrices = [np.eye(2) for i in range(len(cells))]
+# tangent_matrices = [np.array([[1.0, 0.0], [0.0, 1.0]]) for i in range(len(cells))]
 # ------------------------------------------------------------------------------------------------------------------
-(vertices, unknowns_at_vertices), (quadrature_points, unknowns_at_quadrature_points) = solve(
+(
+    (vertices, unknowns_at_vertices),
+    (quadrature_points, unknowns_at_quadrature_points),
+    (f_vertices, f_unknowns_at_vertices),
+) = solve(
     vertices,
     faces,
     cells,
@@ -90,6 +97,7 @@ tangent_matrices = [np.eye(d ** 2) for i in range(len(cells))]
     cells_vertices_connectivity_matrix,
     faces_vertices_connectivity_matrix,
     nsets,
+    flags,
     cell_basis,
     face_basis,
     unknown,
@@ -99,23 +107,69 @@ tangent_matrices = [np.eye(d ** 2) for i in range(len(cells))]
     load,
 )
 # ------------------------------------------------------------------------------------------------------------------
-x, y = vertices.T
-plt.tricontourf(x, y, unknowns_at_vertices[0])
-plt.colorbar()
-plt.show()
-#
-import numpy as np
-import matplotlib.pyplot as plt
+scatter = False
+if scatter:
+    marker_size = 50
+    plt.scatter(f_vertices[:, 0], f_vertices[:, 1], marker_size, c=f_unknowns_at_vertices[0])
+    # plt.scatter(vertices[:, 0], vertices[:, 1], marker_size, c=unknowns_at_vertices[0])
+    cbar = plt.colorbar()
+    plt.show()
 
-x = np.linspace(0.0, 1.0, 100)
-y = np.linspace(0.0, 1.0, 100)
-X, Y = np.meshgrid(x, y)
+    plt.scatter(vertices[:, 0], vertices[:, 1], marker_size, c=unknowns_at_vertices[0])
+    # plt.scatter(vertices[:, 0], vertices[:, 1], marker_size, c=unknowns_at_vertices[0])
+    cbar = plt.colorbar()
+    plt.show()
+else:
+    # x, y = f_vertices.T
+    # plt.tricontourf(x, y, f_unknowns_at_vertices[0], levels=1000)
+    # plt.colorbar()
+    # plt.show()
+    #
+    # fig, ax = plt.subplots(1, 2, sharex=True, sharey=True)
+    # fig, axes = plt.subplots(nrows=2, ncols=2)
+    # for ax in axes.flat:
+    #     im = plt.tricontourf(x, y, f_unknowns_at_vertices[0], levels=1000)
 
-# Z = (1 - X / 2 + X ** 5 + Y ** 3) * np.exp(-(X ** 2) - Y ** 2)  # calcul du tableau des valeurs de Z
-Z = np.sin(2.0 * np.pi / 0.9 * X) * np.sin(2.0 * np.pi / 0.3 * Y)
-Z = Y * (1.0 - Y) * (X ** 3)
+    # fig.subplots_adjust(right=0.8)
+    # cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+    # fig.colorbar(im, cax=cbar_ax)
+    # plt.show()
+    #
+    x, y = vertices.T
+    plt.tricontourf(x, y, unknowns_at_vertices[0], levels=1000)
+    plt.colorbar()
+    plt.show()
+    #
+    x = np.linspace(0.0, 1.0, 100)
+    y = np.linspace(0.0, 1.0, 100)
+    X, Y = np.meshgrid(x, y)
+    Z = 6.0 * Y - 5.0 * Y ** 2
+    plt.pcolor(X, Y, Z)
+    plt.colorbar()
+    plt.show()
 
-plt.pcolor(X, Y, Z)
-plt.colorbar()
+# z = unknowns_at_vertices[0]
+# scaled_z = (z - z.min()) / z.ptp()
+# colors = plt.cm.coolwarm(scaled_z)
+# plt.scatter(vertices[:, 0], vertices[:, 1], c=colors, s=100, linewidths=4)
+# # for pX, pY, val in zip(vertices[:, 0], vertices[:, 1], unknowns_at_vertices[0]):
+# #     plt.scatter(pX, pY, val)
 
-plt.show()
+# plt.colorbar()
+# plt.show()
+# #
+# import numpy as np
+# import matplotlib.pyplot as plt
+
+# x = np.linspace(0.0, 1.0, 100)
+# y = np.linspace(0.0, 1.0, 100)
+# X, Y = np.meshgrid(x, y)
+
+# # Z = (1 - X / 2 + X ** 5 + Y ** 3) * np.exp(-(X ** 2) - Y ** 2)  # calcul du tableau des valeurs de Z
+# Z = np.sin(2.0 * np.pi / 0.9 * X) * np.sin(2.0 * np.pi / 0.3 * Y)
+# Z = Y * (1.0 - Y) * (X ** 3)
+
+# plt.pcolor(X, Y, Z)
+# plt.colorbar()
+
+# # plt.show()

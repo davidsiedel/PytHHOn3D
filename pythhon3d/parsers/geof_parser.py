@@ -72,6 +72,7 @@ def parse_geof_file(geof_file_path):
                         nsets[Nset_name] = Nset_nodes
                         break
             nsets[Nset_name] = Nset_nodes
+        # --------------------------------------------------------------------------------------------------------------
         # ==============================================================================================================
         # EXTRACTING THE CELLS CONNECTIVITY MATRIX
         # ==============================================================================================================
@@ -158,7 +159,7 @@ def parse_geof_file(geof_file_path):
                         if count == len(face_vertices_connectivity_matrix):
                             flags_local.append(key)
                     if not flags_local:
-                        flags_local = ["NONE"]
+                        flags_local = None
                     flags.append(flags_local)
                 # ------------------------------------------------------------------------------------------------------
                 # If the face is already stored :
@@ -166,12 +167,22 @@ def parse_geof_file(geof_file_path):
                 else:
                     cell_face_connectivity_matrix.append(tags.index(tag))
             cells_faces_connectivity_matrix.append(cell_face_connectivity_matrix)
+        # --------------------------------------------------------------------------------------------------------------
+        nsets_faces = {}
+        for boundary_name in nsets:
+            nsets_faces[boundary_name] = []
+        for i, local_flags in enumerate(flags):
+            if not local_flags is None:
+                for flag in local_flags:
+                    nsets_faces[flag].append(i)
         print("problem_dimension :\n {}\n".format(problem_dimension))
         print("vertices :\n {}\n".format(vertices))
         print("cells_vertices_connectivity_matrix :\n {}\n".format(cells_vertices_connectivity_matrix))
         print("faces_vertices_connectivity_matrix :\n {}\n".format(faces_vertices_connectivity_matrix))
         print("cells_faces_connectivity_matrix :\n {}\n".format(cells_faces_connectivity_matrix))
         print("nsets :\n {}\n".format(nsets))
+        print("flags :\n {}\n".format(flags))
+        print("nsets_faces :\n {}\n".format(nsets_faces))
         # return N, C_nc, C_nf, C_cf, weights, nsets, flags
         return (
             problem_dimension,
@@ -181,4 +192,5 @@ def parse_geof_file(geof_file_path):
             cells_faces_connectivity_matrix,
             cells_connectivity_matrix,
             nsets,
+            nsets_faces,
         )
