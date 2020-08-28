@@ -41,6 +41,17 @@
 \RequirePackage{tcolorbox}
 \RequirePackage{bm}
 \RequirePackage{stackengine}
+\RequirePackage[eulergreek]{sansmath}
+\usepackage{stmaryrd}
+
+\RequirePackage{amssymb}
+
+\RequirePackage[bbgreekl]{mathbbol}
+
+\RequirePackage{caption}
+\RequirePackage{subcaption}
+
+
 \tcbuselibrary{skins,breakable}
 
 % ======================================================================================================================
@@ -50,7 +61,11 @@
 \DeclareMathOperator{\Ker}{Ker}
 \DeclareMathOperator{\Ima}{Im}
 \DeclareMathOperator{\Div}{div}
+\DeclareMathOperator{\Det}{det}
 \DeclareMathOperator{\Tr}{Tr}
+
+\DeclareSymbolFontAlphabet{\mathbb}{AMSb}
+\DeclareSymbolFontAlphabet{\mathbbl}{bbold}
 
 % ======================================================================================================================
 % COLORS
@@ -75,7 +90,16 @@
     \begin{tcolorbox}[fonttitle=\bfseries,title={{Remark $:$ {#1}}}, coltitle=black, blanker, left=5.mm, right=0.cm, borderline west={1.mm}{0.cm}{grey}, breakable, overlay={\ifthenelse{\value{tcbbreakpart}=1}{}{}}]}{\end{tcolorbox}
 }
 
+\newenvironment{exemplebox}[1]{
+    \begin{tcolorbox}[fonttitle=\bfseries,title={{Exemple $:$ {#1}}}, coltitle=grey, blanker, left=5.mm, right=0.cm, borderline west={1.mm}{0.cm}{grey}, breakable, overlay={\ifthenelse{\value{tcbbreakpart}=1}{}{}}]}{\end{tcolorbox}
+}
+
 \newmdenv[innerlinewidth=0.5pt, roundcorner=4pt,linecolor=grey,innerleftmargin=6pt, innerrightmargin=6pt,innertopmargin=6pt,innerbottommargin=6pt]{mybox}
+
+\newcommand*{\scriptize}[2][4]{\scalebox{0.75}{$#2$}}
+\newcommand*{\captize}[2][4]{\scalebox{1.60}{$#2$}}
+
+\newcommand*{\scaleit}[2][4]{\scalebox{#1}{$#2$}}
 
 % ======================================================================================================================
 % DIVERS
@@ -89,8 +113,13 @@
     {}^{#1}
 }
 
-\newcommand{\subsuppscript}[2]{
+\newcommand{\subsupscript}[2]{
     {}_{#1}^{#2}
+}
+
+\newcommand{\algebrize}[1]{
+  \mathsfit{#1}
+% \boldsymbol{\mathbf{#1}}
 }
 
 % ======================================================================================================================
@@ -114,16 +143,76 @@
 }
 
 % ======================================================================================================================
+% TENSORIAL NOTATIONS 2
+% ======================================================================================================================
+
+\newcommand{\lighttensoro}[1]{
+    {#1}
+}
+
+\newcommand{\lighttensori}[1]{
+    {\stackunder[-1.5pt]{${{#1}}$}{$-$}}
+}
+
+\newcommand{\lighttensorii}[1]{
+    {\stackunder[1.2pt]{${{#1}}$}{$\scriptstyle \sim$}}
+}
+
+\newcommand{\lighttensoriv}[1]{
+    {\stackunder[1.2pt]{${{#1}}$}{$\scriptstyle \approx$}}
+}
+
+% ======================================================================================================================
 % SCALARS, VECTORS, TENSORS
 % ======================================================================================================================
 
-\newcommand{\llbracket}{[\!\![}
+% \newcommand{\llbracket}{[\!\![}
 
-\newcommand{\rrbracket}{]\!\!]}
+% \newcommand{\rrbracket}{]\!\!]}
+
+\newcommand{\bbnabla}{\nabla\!\!\!\!\nabla}
 
 % ======================================================================================================================
 % TEXT NOTATIONS, FUNCTIONAL SPACES, MESHES
 % ======================================================================================================================
+
+\newcommand{\Hbroken}{
+%   H^1_{nc}(\Omega; \mathbb{R}^{d})
+  H^1(\Mesh; \mathbb{R}^{d})
+}
+
+\newcommand{\Pkapprox}{
+%   H^1_{nc}(\Omega; \mathbb{R}^{d})
+  P^k_h(\Omega; \mathbb{R}^{d})
+}
+
+\newcommand{\Pbroken}{
+  P^k_h(\Mesh; \mathbb{R}^{d})
+}
+
+\newcommand{\Hdiv}{
+  H^1_{div}(\Omega; \mathbb{R}^{d \times d})
+}
+
+\newcommand{\Hone}{
+  H^{1}(\Omega; \mathbb{R}^{d})
+}
+
+\newcommand{\Fv}{
+  \tensori{f} \subscript{v}
+}
+
+\newcommand{\Tn}{
+  \tensori{t} \subscript{n}
+}
+
+\newcommand{\PK}{
+  \tensorii{\pi} \subscript{1}
+}
+
+\newcommand{\Domain}{
+  D
+}
 
 \newcommand{\Mesh}{
     \mathcal{T}_h
@@ -165,44 +254,37 @@
 
 \newcommand{\figref}[1]{\figurename~\ref{#1}}
 
-% \newcommand{\bts}[1]{{\left.#1\right|_{t}}}
+\DeclareSymbolFont{sfletters}{OML}{cmbrm}{m}{it}
 
-% \newcommand{\mts}[1]{{\left.#1\right|_{t+\theta\,\Delta\,t}}}
+\DeclareMathSymbol{\salpha}{\mathord}{sfletters}{"0B}
+\DeclareMathSymbol{\sbeta}{\mathord}{sfletters}{"0C}
+\DeclareMathSymbol{\sgamma}{\mathord}{sfletters}{"0D}
+\DeclareMathSymbol{\sdelta}{\mathord}{sfletters}{"0E}
+\DeclareMathSymbol{\sepsilon}{\mathord}{sfletters}{"0F}
+\DeclareMathSymbol{\szeta}{\mathord}{sfletters}{"10}
+\DeclareMathSymbol{\seta}{\mathord}{sfletters}{"11}
+\DeclareMathSymbol{\stheta}{\mathord}{sfletters}{"12}
+\DeclareMathSymbol{\siota}{\mathord}{sfletters}{"13}
+\DeclareMathSymbol{\skappa}{\mathord}{sfletters}{"14}
+\DeclareMathSymbol{\slambda}{\mathord}{sfletters}{"15}
+\DeclareMathSymbol{\smu}{\mathord}{sfletters}{"16}
+\DeclareMathSymbol{\snu}{\mathord}{sfletters}{"17}
+\DeclareMathSymbol{\sxi}{\mathord}{sfletters}{"18}
+\DeclareMathSymbol{\spi}{\mathord}{sfletters}{"19}
+\DeclareMathSymbol{\srho}{\mathord}{sfletters}{"1A}
+\DeclareMathSymbol{\ssigma}{\mathord}{sfletters}{"1B}
+\DeclareMathSymbol{\stau}{\mathord}{sfletters}{"1C}
+\DeclareMathSymbol{\supsilon}{\mathord}{sfletters}{"1D}
+\DeclareMathSymbol{\sphi}{\mathord}{sfletters}{"1E}
+\DeclareMathSymbol{\schi}{\mathord}{sfletters}{"1F}
+\DeclareMathSymbol{\spsi}{\mathord}{sfletters}{"20}
+\DeclareMathSymbol{\somega}{\mathord}{sfletters}{"21}
+\DeclareMathSymbol{\svarepsilon}{\mathord}{sfletters}{"22}
+\DeclareMathSymbol{\svartheta}{\mathord}{sfletters}{"23}
+\DeclareMathSymbol{\svarpi}{\mathord}{sfletters}{"24}
+\DeclareMathSymbol{\svarrho}{\mathord}{sfletters}{"25}
+\DeclareMathSymbol{\svarsigma}{\mathord}{sfletters}{"26}
+\DeclareMathSymbol{\svarphi}{\mathord}{sfletters}{"27}
 
-% \newcommand{\ets}[1]{{\left.#1\right|_{t+\Delta\,t}}}
-
-% \newcommand{\current}[1]{{\left.#1\right|_{(n)}}}
-
-% \newcommand{\apre}[1]{{\left.#1\right|_{(n+1)}}}
-
-% \newcommand{\corr}[1]{{\delta\left.#1\right|_{(n)}}}
-
-% \newcommand{\transpose}[1]{{\mbox{}^{\mathop{T}}#1}}
-
-% \newcommand{\paren}[1]{{\left(#1\right)}}
-
-% \newcommand{\stensor}[1]{\underline{#1}}
-
-% \newcommand{\tensor}[1]{{\underset{\tilde{}}{#1}}}
-
-% \newcommand{\mn}[1]{\mathbf{#1}}
-
-% \newcommand{\Frac}[2]{{{\displaystyle \frac{\displaystyle#1}{\displaystyle#2}}}}
-
-% \newcommand{\dtot}{{{\mathrm{d}}}}
-
-% \newcommand{\deriv}[2]{{\displaystyle \frac{\displaystyle \partial#1}{\displaystyle \partial#2}}}
-
-% \newcommand{\derivtot}[2]{{\displaystyle \frac{\dtot#1}{\dtot#2}}}
-
-% \newcommand{\jump}[1]{\left[#1\right]}
-
-% \newcommand{\gj}{g^{\jump{\vec{u}}}}
-
-% \newcommand{\Gj}{\mn{G}^{\jump{\vec{u}}}}
-
-% \newcommand{\cell}[1]{#1^{(T)}}
-
-% \newcommand{\face}[1]{#1^{(\partial T)}}
-
-% \newcommand{\numberedface}[2]{#1^{(f_{#2})}}
+\DeclareMathAlphabet{\mathsfit}{T1}{\sfdefault}{\mddefault}{\sldefault}
+\SetMathAlphabet{\mathsfit}{bold}{T1}{\sfdefault}{\bfdefault}{\sldefault}

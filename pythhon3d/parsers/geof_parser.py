@@ -168,6 +168,7 @@ def parse_geof_file(geof_file_path):
                     cell_face_connectivity_matrix.append(tags.index(tag))
             cells_faces_connectivity_matrix.append(cell_face_connectivity_matrix)
         # --------------------------------------------------------------------------------------------------------------
+        print("HEEERE : \n{}, {}".format(len(flags), len(faces_vertices_connectivity_matrix)))
         nsets_faces = {}
         for boundary_name in nsets:
             nsets_faces[boundary_name] = []
