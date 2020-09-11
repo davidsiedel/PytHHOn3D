@@ -1,3 +1,5 @@
 # SHAPES
-- write a custom geof_file with a polyhedron in it
-- check if the polyhedron partition works on a general mesh using the custom mesh file
+- Implement the function returning the centroid of a polyhedron
+# QUADRATURE
+- Implement quadrature on quadrangles, hexahedra and prisms
+- Fix quadraure of the tetrahedron

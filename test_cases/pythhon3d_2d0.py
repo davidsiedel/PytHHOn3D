@@ -16,7 +16,7 @@ from core.operators.hdg import HDG
 from pythhon3d import build, solve
 
 d = 2
-face_polynomial_order = 1
+face_polynomial_order = 2
 cell_polynomial_order = 2
 field_dimension = 1
 stabilization_parameter = 10.0  # K2
@@ -120,6 +120,45 @@ if scatter:
     cbar = plt.colorbar()
     plt.show()
 else:
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as colors
+    import matplotlib.cbook as cbook
+
+    x = np.linspace(0.0, 1.0, 100)
+    y = np.linspace(0.0, 1.0, 100)
+    X, Y = np.meshgrid(x, y)
+    Z = 6.0 * Y - 5.0 * Y ** 2
+
+    import matplotlib.cm as cm
+    import matplotlib.mlab as mlab
+    import matplotlib.pyplot as plt
+
+    col_levels = 10
+    # CS = plt.contourf(X, Y, Z, 5, vmin=-0.2, vmax=2.0, cmap=cm.viridis)
+    # CS = plt.contourf(X, Y, Z, 1000, vmin=-0.0, vmax=1.8066059951119915, cmap=cm.viridis)
+    CS = plt.contourf(X, Y, Z, col_levels, vmin=-0.0, vmax=2.0, cmap=cm.viridis)
+    # plt.title("Simplest default with labels")
+    m = plt.cm.ScalarMappable(cmap=cm.viridis)
+    m.set_array(Z)
+    # m.set_clim(-0.2, 2.0)
+    # m.set_clim(-0.0, 1.8066059951119915)
+    m.set_clim(-0.0, 2.0)
+    # plt.colorbar(m, boundaries=np.linspace(-0.2, 2.0, 1000))
+    # plt.colorbar(m, boundaries=np.linspace(0.0, 1.8066059951119915, 1000))
+    plt.colorbar(m, boundaries=np.linspace(0.0, 2.0, col_levels))
+    plt.show()
+
+    # fig, ax = plt.subplots()
+
+    # bounds = np.linspace(0, 2.01, 12)
+    # norm = colors.BoundaryNorm(boundaries=bounds, ncolors=250)
+    # pcm = ax.pcolormesh(X, Y, Z, norm=norm, cmap="viridis")
+    # fig.colorbar(pcm, ax=ax, extend="neither", orientation="vertical", vmin=0, vmax=2)
+    # # plt.pcolor(X, Y, Z, norm=norm)
+    # # plt.colorbar()
+    # # plt.colorbar()
+    # plt.show()
+    # -----------
     # x, y = f_vertices.T
     # plt.tricontourf(x, y, f_unknowns_at_vertices[0], levels=1000)
     # plt.colorbar()
@@ -136,17 +175,30 @@ else:
     # plt.show()
     #
     x, y = vertices.T
-    plt.tricontourf(x, y, unknowns_at_vertices[0], levels=1000)
+    print("MAXXXX : {}".format(max(unknowns_at_vertices[0])))
+    print("MINNNN : {}".format(min(unknowns_at_vertices[0])))
+    levels = np.linspace(0.0, 2.00, col_levels)
+    plt.tricontourf(x, y, unknowns_at_vertices[0], levels=levels)
     plt.colorbar()
     plt.show()
-    #
-    x = np.linspace(0.0, 1.0, 100)
-    y = np.linspace(0.0, 1.0, 100)
-    X, Y = np.meshgrid(x, y)
-    Z = 6.0 * Y - 5.0 * Y ** 2
-    plt.pcolor(X, Y, Z)
-    plt.colorbar()
-    plt.show()
+
+    # import matplotlib.cm as cm
+    # import matplotlib.mlab as mlab
+    # import matplotlib.pyplot as plt
+
+    # CS = plt.contourf(x, y, Z, unknowns_at_vertices[0], vmin=0.0, vmax=2.0, cmap=cm.viridis)
+    # plt.title("Simplest default with labels")
+    # m = plt.cm.ScalarMappable(cmap=cm.viridis)
+    # m.set_array(Z)
+    # m.set_clim(0.0, 2.0)
+    # plt.colorbar(m, boundaries=np.linspace(0, 2, 12))
+    # plt.show()
+
+    # bounds = np.linspace(-1, 1, 10)
+    # norm = colors.BoundaryNorm(boundaries=bounds, ncolors=256)
+    # pcm = ax[0].pcolormesh(X, Y, Z, norm=norm, cmap="RdBu_r")
+    # fig.colorbar(pcm, ax=ax[0], extend="both", orientation="vertical")
+
 
 # z = unknowns_at_vertices[0]
 # scaled_z = (z - z.min()) / z.ptp()

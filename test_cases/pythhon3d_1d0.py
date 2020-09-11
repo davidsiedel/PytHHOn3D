@@ -36,6 +36,18 @@ boundary_conditions = {
     "LEFT": (displacement_left, pressure_left),
 }
 # ------------------------------------------------------------------------------------------------------------------
+# vertices,
+#         faces,
+#         cells,
+#         operators,
+#         cells_faces_connectivity_matrix,
+#         cells_vertices_connectivity_matrix,
+#         faces_vertices_connectivity_matrix,
+#         nsets,
+#         nsets_faces,
+#         cell_basis,
+#         face_basis,
+#         unknown,
 (
     vertices,
     faces,
@@ -45,6 +57,7 @@ boundary_conditions = {
     cells_vertices_connectivity_matrix,
     faces_vertices_connectivity_matrix,
     nsets,
+    nsets_faces,
     cell_basis,
     face_basis,
     unknown,
@@ -53,7 +66,31 @@ boundary_conditions = {
 d = unknown.problem_dimension
 tangent_matrices = [np.eye(d ** 2) for i in range(len(cells))]
 # ------------------------------------------------------------------------------------------------------------------
-(vertices, unknowns_at_vertices), (quadrature_points, unknowns_at_quadrature_points) = solve(
+# vertices: Mat,
+# faces: List[Face],
+# cells: List[Cell],
+# operators: List[Operator],
+# cells_faces_connectivity_matrix: Mat,
+# cells_vertices_connectivity_matrix: Mat,
+# faces_vertices_connectivity_matrix: Mat,
+# nsets: dict,
+# # flags: List[str],
+# nsets_faces: dict,
+# cell_basis: Basis,
+# face_basis: Basis,
+# unknown: Unknown,
+# tangent_matrices: List[Mat],
+# stabilization_parameter: float,
+# boundary_conditions: dict,
+# load: List[Callable],
+# (vertices, unknowns_at_vertices),
+#         (quadrature_points, unknowns_at_quadrature_points),
+#         (vertices, f_unknowns_at_vertices),
+(
+    (vertices, unknowns_at_vertices),
+    (quadrature_points, unknowns_at_quadrature_points),
+    (vertices, f_unknowns_at_vertices),
+) = solve(
     vertices,
     faces,
     cells,
@@ -62,6 +99,7 @@ tangent_matrices = [np.eye(d ** 2) for i in range(len(cells))]
     cells_vertices_connectivity_matrix,
     faces_vertices_connectivity_matrix,
     nsets,
+    nsets_faces,
     cell_basis,
     face_basis,
     unknown,
