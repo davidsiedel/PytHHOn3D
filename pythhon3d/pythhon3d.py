@@ -460,7 +460,7 @@ def solve(
     # ------------------------------------------------------------------------------------------------------------------
     number_of_quadrature_points = 0
     for cell in cells:
-        number_of_quadrature_points_in_cell = cell.quadrature_nodes.shape[0]
+        number_of_quadrature_points_in_cell = cell.quadrature_points.shape[0]
         number_of_quadrature_points += number_of_quadrature_points_in_cell
     number_of_vertices = vertices.shape[0]
     # ------------------------------------------------------------------------------------------------------------------
@@ -537,7 +537,7 @@ def solve(
                 unknowns_at_vertices[direction][l0:l1] += np.sum(vertex_value_vector)
                 vertices_weights[l0:l1] += 1.0
         # --------------------------------------------------------------------------------------------------------------
-        for i, quadrature_point in enumerate(local_cell.quadrature_nodes):
+        for i, quadrature_point in enumerate(local_cell.quadrature_points):
             v = cell_basis.get_phi_vector(quadrature_point, local_cell.centroid, local_cell.volume)
             for direction in range(unknown.field_dimension):
                 l0 = direction * cell_basis.basis_dimension

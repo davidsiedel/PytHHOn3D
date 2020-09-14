@@ -37,7 +37,7 @@ class Cell(Domain):
             centroid = c.centroid
             volume = c.volume
             diameter = None
-            quadrature_nodes = c.quadrature_nodes
+            quadrature_points = c.quadrature_points
             quadrature_weights = c.quadrature_weights
             del c
         if cell_shape == "TRIANGLE":
@@ -45,7 +45,7 @@ class Cell(Domain):
             centroid = c.centroid
             volume = c.volume
             diameter = None
-            quadrature_nodes = c.quadrature_nodes
+            quadrature_points = c.quadrature_points
             quadrature_weights = c.quadrature_weights
             del c
         if cell_shape == "POLYGON":
@@ -53,7 +53,7 @@ class Cell(Domain):
             centroid = c.centroid
             volume = c.volume
             diameter = None
-            quadrature_nodes = c.quadrature_nodes
+            quadrature_points = c.quadrature_points
             quadrature_weights = c.quadrature_weights
             del c
         if cell_shape == "TETRAHEDRON":
@@ -61,7 +61,7 @@ class Cell(Domain):
             centroid = c.centroid
             volume = c.volume
             diameter = None
-            quadrature_nodes = c.quadrature_nodes
+            quadrature_points = c.quadrature_points
             quadrature_weights = c.quadrature_weights
             del c
         if cell_shape == "POLYHEDRON":
@@ -69,10 +69,10 @@ class Cell(Domain):
             centroid = c.centroid
             volume = c.volume
             diameter = None
-            quadrature_nodes = c.quadrature_nodes
+            quadrature_points = c.quadrature_points
             quadrature_weights = c.quadrature_weights
             del c
-        super().__init__(centroid, volume, diameter, quadrature_nodes, quadrature_weights)
+        super().__init__(centroid, volume, diameter, quadrature_points, quadrature_weights)
 
     @staticmethod
     def get_cell_shape(vertices: Mat) -> str:

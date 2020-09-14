@@ -53,7 +53,7 @@ class Face(Domain):
             centroid = f.centroid
             volume = f.volume
             diameter = f.diameter
-            quadrature_nodes = f.quadrature_nodes
+            quadrature_points = f.quadrature_points
             quadrature_weights = f.quadrature_weights
             del f
         if face_shape == "SEGMENT":
@@ -61,7 +61,7 @@ class Face(Domain):
             centroid = f.centroid
             volume = f.volume
             diameter = f.diameter
-            quadrature_nodes = f.quadrature_nodes
+            quadrature_points = f.quadrature_points
             quadrature_weights = f.quadrature_weights
             del f
         if face_shape == "TRIANGLE":
@@ -69,7 +69,7 @@ class Face(Domain):
             centroid = f.centroid
             volume = f.volume
             diameter = f.diameter
-            quadrature_nodes = f.quadrature_nodes
+            quadrature_points = f.quadrature_points
             quadrature_weights = f.quadrature_weights
             del f
         if face_shape == "QUADRANGLE":
@@ -77,7 +77,7 @@ class Face(Domain):
             centroid = f.centroid
             volume = f.volume
             diameter = f.diameter
-            quadrature_nodes = f.quadrature_nodes
+            quadrature_points = f.quadrature_points
             quadrature_weights = f.quadrature_weights
             del f
         if face_shape == "POLYGON":
@@ -85,7 +85,7 @@ class Face(Domain):
             centroid = f.centroid
             volume = f.volume
             diameter = f.diameter
-            quadrature_nodes = f.quadrature_nodes
+            quadrature_points = f.quadrature_points
             quadrature_weights = f.quadrature_weights
             del f
         # --------------------------------------------------------------------------------------------------------------
@@ -95,10 +95,10 @@ class Face(Domain):
         # --------------------------------------------------------------------------------------------------------------
         # Appending the normal component to quadrature points
         # --------------------------------------------------------------------------------------------------------------
-        number_of_quadrature_points = quadrature_nodes.shape[0]
+        number_of_quadrature_points = quadrature_points.shape[0]
         face_distance_to_origin_vector = np.full((number_of_quadrature_points, 1), distance_to_origin)
         quadrature_points_in_face_reference_frame = np.concatenate(
-            (quadrature_nodes, face_distance_to_origin_vector), axis=1
+            (quadrature_points, face_distance_to_origin_vector), axis=1
         )
         # --------------------------------------------------------------------------------------------------------------
         # Appending the normal component to the centroid
