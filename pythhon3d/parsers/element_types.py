@@ -1,3 +1,10 @@
+"""
+====================================================================================================================
+Script :
+====================================================================================================================
+Defines the types of geometries defining an element, and the order in which vertices are stored in an element
+"""
+
 import numpy as np
 
 C_c1d2 = np.array([[0], [1]])

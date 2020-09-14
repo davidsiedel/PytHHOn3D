@@ -11,15 +11,21 @@ class Tetrahedron(Domain):
         ================================================================================================================
         Class :
         ================================================================================================================
-        
+        The Tetrahedron class inherits from the Domain class to specifiy its attributes when the domain is a
+        tetrahedron.
         ================================================================================================================
         Parameters :
         ================================================================================================================
-        
+        - vertices : the matrix containing the vertices coordinates as vectors.
+        - polynomial_order : the polynomial order of integration over the tetrahedron.
         ================================================================================================================
         Attributes :
         ================================================================================================================
-        
+        - centroid : the vector with values containing the center of mass of the tetrahedron.
+        - volume : the volume of the tetrahedron.
+        - diameter : the diameter of the tetrahedron.
+        - quadrature_points : the matrix containing the quadrature points of the tetrahedron.
+        - quadrature_weights : the vector containing the quadrature weights of the tetrahedron.
         """
         if not vertices.shape == (4, 3):
             raise TypeError("The domain vertices do not match that of a tetrahedron")
@@ -36,17 +42,17 @@ class Tetrahedron(Domain):
     def get_tetrahedron_volume(vertices: Mat) -> float:
         """
         ================================================================================================================
-        Description :
+        Method :
         ================================================================================================================
-        
+        Computes the volume of a tetrahedron.
         ================================================================================================================
         Parameters :
         ================================================================================================================
-        
+        - vertices : the matrix containing the coordinates of the vertices of the tetrahedron as vectors.
         ================================================================================================================
-        Exemple :
+        Returns :
         ================================================================================================================
-    
+        - tetrahedron_volume : the volume of the tetrahedron.
         """
         shape_dimension = 3
         tetrahedron_origin_vertex_vector = np.tile(vertices[0], (shape_dimension + 1, 1))

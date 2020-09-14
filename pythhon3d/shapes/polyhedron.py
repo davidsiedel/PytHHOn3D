@@ -13,16 +13,22 @@ class Polyhedron(Domain):
         ================================================================================================================
         Class :
         ================================================================================================================
-        
+        The Polyhedron class inherits from the Domain class to specifiy its attributes when the domain is a polygon.
         ================================================================================================================
         Parameters :
         ================================================================================================================
-        
+        - vertices : the matrix containing the vertices coordinates as vectors.
+        - polynomial_order : the polynomial order of integration over the polyhedron.
+        - connectivity_matrix : the matrix that specifies the connection between the vertices of the polyhedron and its 
+        faces, as a list of indices corresponding to the vertex indices for each face. The number of rows is the number of faces, and for each row, the number of columns is the number of vertices composing the face.
         ================================================================================================================
         Attributes :
         ================================================================================================================
-        
-        connectivity_matrix de la forme [[0,1,2], [2,3,6], [2,8,5],...] avec la liste des noeuds en tableau organisés par face dans le repère local := declaration de l'element
+        - centroid : the vector with values containing the center of mass of the polyhedron.
+        - volume : the volume of the polyhedron.
+        - diameter : the diameter of the polyhedron.
+        - quadrature_points : the matrix containing the quadrature points of the polyhedron.
+        - quadrature_weights : the vector containing the quadrature weights of the polyhedron.
         """
         if not vertices.shape[0] > 4 and not vertices.shape[1] == 2:
             raise TypeError("The domain dimensions do not match that of a polygon")
@@ -34,37 +40,40 @@ class Polyhedron(Domain):
             # print(simplicial_sub_domains)
             volume = 0.0
             diameter = None
-            quadrature_nodes, quadrature_weights = [], []
+            quadrature_points, quadrature_weights = [], []
             for simplicial_sub_domain in simplicial_sub_domains:
                 simplex_volume = Tetrahedron.get_tetrahedron_volume(simplicial_sub_domain)
-                simplex_quadrature_nodes, simplex_quadrature_weights = DunavantRule.get_tetrahedron_quadrature(
+                simplex_quadrature_points, simplex_quadrature_weights = DunavantRule.get_tetrahedron_quadrature(
                     simplicial_sub_domain, simplex_volume, polynomial_order
                 )
                 volume += simplex_volume
-                quadrature_nodes.append(simplex_quadrature_nodes)
+                quadrature_points.append(simplex_quadrature_points)
                 quadrature_weights.append(simplex_quadrature_weights)
-            quadrature_nodes = np.concatenate(quadrature_nodes, axis=0)
+            quadrature_points = np.concatenate(quadrature_points, axis=0)
             quadrature_weights = np.concatenate(quadrature_weights, axis=0)
-            super().__init__(barycenter, volume, diameter, quadrature_nodes, quadrature_weights)
+            super().__init__(barycenter, volume, diameter, quadrature_points, quadrature_weights)
 
     @staticmethod
     def get_polyhedron_simplicial_partition(vertices: Mat, connectivity_matrix: Mat, barycenter: Mat) -> Mat:
         """
         ================================================================================================================
-        Description :
+        Method :
         ================================================================================================================
-        
+        Computes the partition of a polyhedron into tetrahedra. Each tetrahedron consists in the barycenter of the polygon, and a triangle that composing the simplicial partition of a face.
         ================================================================================================================
         Parameters :
         ================================================================================================================
-        
+        - vertices : the matrix containing the vertices coordinates as vectors.
+        - connectivity_matrix : the matrix that specifies the connection between the vertices of the polyhedron and its 
+        faces, as a list of indices corresponding to the vertex indices for each face. The number of rows is the number of faces, and for each row, the number of columns is the number of vertices composing the face.
+        - polynomial_order : the polynomial order of integration over the polyhedron.
         ================================================================================================================
-        Exemple :
+        Returns :
         ================================================================================================================
-    
-        connectivity_matrix de la forme [[0,1,2], [2,3,6], [2,8,5],...] avec la liste des noeuds en tableau organisés par face dans le repère local := declaration de l'element
+        - simplicial_sub_domains : the list of matrices containing the vertices of each tetrahedron composing the
+        partition of the polyhedron.
         """
-        tetras = []
+        simplicial_sub_domains = []
         for face_vertices_indexes in connectivity_matrix:
             face_vertices = vertices[face_vertices_indexes]
             if face_vertices.shape[0] > 3:
@@ -73,9 +82,9 @@ class Polyhedron(Domain):
                 for sub_face in sub_faces:
                     b = np.resize(barycenter, (1, 3))
                     tetra = np.concatenate((sub_face, b), axis=0)
-                    tetras.append(tetra)
+                    simplicial_sub_domains.append(tetra)
             else:
                 b = np.resize(barycenter, (1, 3))
                 tetra = np.concatenate((face_vertices, b), axis=0)
-                tetras.append(tetra)
-        return tetras
+                simplicial_sub_domains.append(tetra)
+        return simplicial_sub_domains

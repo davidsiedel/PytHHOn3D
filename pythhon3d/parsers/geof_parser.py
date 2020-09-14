@@ -6,17 +6,31 @@ from parsers.element_types import C_cf_ref
 def parse_geof_file(geof_file_path):
     """
     ====================================================================================================================
-    Description :
+    Function :
     ====================================================================================================================
-    
+    Reads a .geof mesh file, and extracts needed data about the structure to build the HHO framework
     ====================================================================================================================
     Parameters :
     ====================================================================================================================
-    
+    - geof_file_path : the absolute path to the mesh file to read
     ====================================================================================================================
-    Exemple :
+    Returns :
     ====================================================================================================================
-    
+    - problem_dimension : the integer that defines the dimension of the euclidian space.
+    - vertices : the matrix containing all coordinates of the vertices as vectors. Each row corresponds to a vertex in
+    the mesh, and the number of colums is the number of vertices in the mesh.
+    - cells_vertices_connectivity_matrix : the connectivity matrix, that links a cell to vertices indices in the 
+    vertices matrix. rows in cells_vertices_connectivity_matrix correspon to indices of cells in the mesh (i.e. the
+    equivalent of an element in the FE methdod using Lagrange elements), and columns in
+    cells_vertices_connectivity_matrix are the vertices indices to which the cell is attached.
+    - faces_vertices_connectivity_matrix : the connectivity matrix, that links a face to vertices indices in the 
+    vertices matrix, with same strcuture as cells_vertices_connectivity_matrix.
+    - cells_faces_connectivity_matrix : the connectivity matrix, that links a cell to faces indices. A face index corresponds to a row index in faces_vertices_connectivity_matrix.
+    - cells_connectivity_matrix : 
+    - nsets : a dictionary with correspondance between a vertices set name, denoted with a string, and a list of 
+    vertex indices, containing the indices of all vertices connected to that vertices set.
+    - nsets_faces : a dictionary with correspondance between a faces set name, denoted with a string, and a list of 
+    face indices, containing the indices of all faces connected to that vertices set.
     """
     with open(geof_file_path, "r") as geof_file:
         c = geof_file.readlines()
@@ -41,9 +55,8 @@ def parse_geof_file(geof_file_path):
         # reading the dimension of the C_nc matrix.
         # --------------------------------------------------------------------------------------------------------------
         N_cells = int(c[i_line].rstrip())
-        # ==============================================================================================================
+        # --------------------------------------------------------------------------------------------------------------
         # EXTRACTING THE NSETS MATRICES
-        # ==============================================================================================================
         # --------------------------------------------------------------------------------------------------------------
         # skipping the extraction of the cells connectivity matrix to extract
         # directly the nsets matrices. By doing so, it is easier when defining
@@ -73,9 +86,7 @@ def parse_geof_file(geof_file_path):
                         break
             nsets[Nset_name] = Nset_nodes
         # --------------------------------------------------------------------------------------------------------------
-        # ==============================================================================================================
         # EXTRACTING THE CELLS CONNECTIVITY MATRIX
-        # ==============================================================================================================
         # --------------------------------------------------------------------------------------------------------------
         # getting back to the line where the connectivity between cells and
         # nodes is defined.
@@ -184,7 +195,6 @@ def parse_geof_file(geof_file_path):
         print("nsets :\n {}\n".format(nsets))
         print("flags :\n {}\n".format(flags))
         print("nsets_faces :\n {}\n".format(nsets_faces))
-        # return N, C_nc, C_nf, C_cf, weights, nsets, flags
         return (
             problem_dimension,
             vertices,

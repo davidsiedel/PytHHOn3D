@@ -14,7 +14,7 @@ class Basis:
         Parameters :
         ================================================================================================================
         - polynomial_order : the polynomial order
-        - domain_dimension : the spatial dimension for polynoms
+        - domain_dimension : the spatial dimension for the support in which polynomials act
         ================================================================================================================
         Attributes :
         ================================================================================================================

@@ -11,15 +11,20 @@ class Triangle(Domain):
         ================================================================================================================
         Class :
         ================================================================================================================
-        
+        The Triangle class inherits from the Domain class to specifiy its attributes when the domain is a triangle.
         ================================================================================================================
         Parameters :
         ================================================================================================================
-        
+        - vertices : the matrix containing the vertices coordinates as vectors.
+        - polynomial_order : the polynomial order of integration over the triangle.
         ================================================================================================================
         Attributes :
         ================================================================================================================
-        
+        - centroid : the vector with values containing the center of mass of the triangle.
+        - volume : the volume of the triangle.
+        - diameter : the diameter of the triangle.
+        - quadrature_points : the matrix containing the quadrature points of the triangle.
+        - quadrature_weights : the vector containing the quadrature weights of the triangle.
         """
         if not vertices.shape == (3, 2):
             raise TypeError("The domain vertices do not match that of a triangle")
@@ -36,17 +41,17 @@ class Triangle(Domain):
     def get_triangle_volume(vertices: Mat) -> float:
         """
         ================================================================================================================
-        Description :
+        Method :
         ================================================================================================================
-        
+        Computes the surface of a triangle.
         ================================================================================================================
         Parameters :
         ================================================================================================================
-        
+        - vertices : the matrix containing the coordinates of the vertices of the triangle as vectors.
         ================================================================================================================
-        Exemple :
+        Returns :
         ================================================================================================================
-    
+        - triangle_volume : the surface of the triangle.
         """
         shape_dimension = 2
         triangle_origin_vertex_vector = np.tile(vertices[0], (shape_dimension + 1, 1))
@@ -58,17 +63,17 @@ class Triangle(Domain):
     def get_triangle_diameter(vertices: Mat) -> float:
         """
         ================================================================================================================
-        Description :
+        Method :
         ================================================================================================================
-        
+        Computes the diameter of a triangle.
         ================================================================================================================
         Parameters :
         ================================================================================================================
-        
+        - vertices : the matrix containing the coordinates of the vertices of the triangle as vectors.
         ================================================================================================================
-        Exemple :
+        Returns :
         ================================================================================================================
-    
+        - triangle_diameter : the diameter of the triangle.
         """
         shape_dimension = 2
         triangle_origin_vertex_vector = np.tile(vertices[0], (shape_dimension + 1, 1))
