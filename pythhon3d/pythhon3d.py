@@ -13,6 +13,7 @@ from core.cell import Cell
 from core.unknown import Unknown
 from core.operators.operator import Operator
 from core.operators.hdg import HDG
+from core.operators.hho import HHO
 from core.pressure import Pressure
 from core.displacement import Displacement
 from core.load import Load
@@ -72,7 +73,7 @@ def build(
     # ------------------------------------------------------------------------------------------------------------------
     # Checking polynomial order consistency
     # ------------------------------------------------------------------------------------------------------------------
-    is_polynomial_order_consistent(face_polynomial_order, cell_polynomial_order)
+    # is_polynomial_order_consistent(face_polynomial_order, cell_polynomial_order)
     # ------------------------------------------------------------------------------------------------------------------
     # Reading the mesh file, and extracting conectivity matrices
     # ------------------------------------------------------------------------------------------------------------------
@@ -97,9 +98,12 @@ def build(
     # ------------------------------------------------------------------------------------------------------------------
     # Initilaizing polynomial bases
     # ------------------------------------------------------------------------------------------------------------------
-    face_basis = ScaledMonomial(face_polynomial_order, problem_dimension - 1)
-    cell_basis = ScaledMonomial(cell_polynomial_order, problem_dimension)
+    face_basis_k = ScaledMonomial(face_polynomial_order, problem_dimension - 1)
+    cell_basis_k = ScaledMonomial(face_polynomial_order, problem_dimension)
+    cell_basis_l = ScaledMonomial(cell_polynomial_order, problem_dimension)
+    cell_basis_k1 = ScaledMonomial(face_polynomial_order + 1, problem_dimension)
     integration_order = unknown.integration_order
+    # print(integration_order)
     # ------------------------------------------------------------------------------------------------------------------
     # Initilaizing Face objects
     # ------------------------------------------------------------------------------------------------------------------
@@ -125,7 +129,9 @@ def build(
     operators = []
     for i, cell in enumerate(cells):
         local_faces = [faces[j] for j in cells_faces_connectivity_matrix[i]]
-        op = get_operator(operator_type, cell, local_faces, cell_basis, face_basis, unknown)
+        op = get_operator(
+            operator_type, cell, local_faces, cell_basis_l, cell_basis_k, cell_basis_k1, face_basis_k, unknown
+        )
         operators.append(op)
     return (
         vertices,
@@ -137,8 +143,9 @@ def build(
         faces_vertices_connectivity_matrix,
         nsets,
         nsets_faces,
-        cell_basis,
-        face_basis,
+        cell_basis_l,
+        cell_basis_k,
+        face_basis_k,
         unknown,
     )
 
@@ -154,8 +161,9 @@ def solve(
     nsets: dict,
     # flags: List[str],
     nsets_faces: dict,
-    cell_basis: Basis,
-    face_basis: Basis,
+    cell_basis_l: Basis,
+    cell_basis_k: Basis,
+    face_basis_k: Basis,
     unknown: Unknown,
     tangent_matrices: List[Mat],
     stabilization_parameter: float,
@@ -180,7 +188,7 @@ def solve(
     # ------------------------------------------------------------------------------------------------------------------
     number_of_faces = len(faces_vertices_connectivity_matrix)
     number_of_cells = len(cells_vertices_connectivity_matrix)
-    total_system_size = number_of_faces * face_basis.basis_dimension * unknown.field_dimension
+    total_system_size = number_of_faces * face_basis_k.basis_dimension * unknown.field_dimension
     global_matrix = np.zeros((total_system_size, total_system_size))
     global_vector = np.zeros((total_system_size,))
     stored_matrices = []
@@ -195,11 +203,13 @@ def solve(
         # External forces
         # --------------------------------------------------------------------------------------------------------------
         number_of_local_faces = len(local_faces)
-        a = unknown.field_dimension * (cell_basis.basis_dimension + number_of_local_faces * face_basis.basis_dimension)
+        a = unknown.field_dimension * (
+            cell_basis_l.basis_dimension + number_of_local_faces * face_basis_k.basis_dimension
+        )
         local_external_forces = np.zeros((a,))
-        load_vector = Load(local_cell, cell_basis, unknown, load).load_vector
+        load_vector = Load(local_cell, cell_basis_l, unknown, load).load_vector
         l0 = 0
-        l1 = unknown.field_dimension * cell_basis.basis_dimension
+        l1 = unknown.field_dimension * cell_basis_l.basis_dimension
         local_external_forces[l0:l1] += load_vector
         connectivity = cells_faces_connectivity_matrix[cell_index]
         local_faces_indices = cells_faces_connectivity_matrix[cell_index]
@@ -211,43 +221,44 @@ def solve(
                 if connectivity[local_face_index] in nset:
                     pressure = boundary_conditions[boundary_name][1]
                     pressure_vector = Pressure(
-                        face, face_basis, face_reference_frame_transformation_matrix, unknown, pressure
+                        face, face_basis_k, face_reference_frame_transformation_matrix, unknown, pressure
                     ).pressure_vector
                 else:
                     pressure_vector = Pressure(
-                        face, face_basis, face_reference_frame_transformation_matrix, unknown
+                        face, face_basis_k, face_reference_frame_transformation_matrix, unknown
                     ).pressure_vector
-            l0 = local_face_index * unknown.field_dimension * face_basis.basis_dimension
-            l1 = (local_face_index + 1) * unknown.field_dimension * face_basis.basis_dimension
+            l0 = local_face_index * unknown.field_dimension * face_basis_k.basis_dimension
+            l1 = (local_face_index + 1) * unknown.field_dimension * face_basis_k.basis_dimension
             local_external_forces[l0:l1] += pressure_vector
         # --------------------------------------------------------------------------------------------------------------
         # Stffness matrix
         # --------------------------------------------------------------------------------------------------------------
         tangent_matrix = tangent_matrices[cell_index]
         tangent_matrix_size = tangent_matrix.shape[0]
-        total_size = tangent_matrix_size * cell_basis.basis_dimension
+        total_size = tangent_matrix_size * cell_basis_k.basis_dimension
         local_mass_matrix = np.zeros((total_size, total_size))
-        m_phi_phi_cell = Integration.get_cell_mass_matrix_in_cell(local_cell, cell_basis)
+        m_phi_phi_cell = Integration.get_cell_mass_matrix_in_cell(local_cell, cell_basis_k, cell_basis_k)
         for i in range(tangent_matrix.shape[0]):
             for j in range(tangent_matrix.shape[1]):
                 m = tangent_matrix[i, j] * m_phi_phi_cell
                 # ------------------------------------------------------------------------------------------------------
-                l0 = i * cell_basis.basis_dimension
-                l1 = (i + 1) * cell_basis.basis_dimension
-                c0 = j * cell_basis.basis_dimension
-                c1 = (j + 1) * cell_basis.basis_dimension
+                l0 = i * cell_basis_k.basis_dimension
+                l1 = (i + 1) * cell_basis_k.basis_dimension
+                c0 = j * cell_basis_k.basis_dimension
+                c1 = (j + 1) * cell_basis_k.basis_dimension
                 # ------------------------------------------------------------------------------------------------------
                 local_mass_matrix[l0:l1, c0:c1] += m
         local_gradient_operator = operators[cell_index].local_gradient_operator
+        # print(local_gradient_operator.shape)
         local_stiffness_form = local_gradient_operator.T @ local_mass_matrix @ local_gradient_operator
         # --------------------------------------------------------------------------------------------------------------
         # Stabilization matrix
         # --------------------------------------------------------------------------------------------------------------
-        local_stabilization_form = stabilization_parameter * operators[cell_index].local_stabilization_form
+        local_stabilization_operator = stabilization_parameter * operators[cell_index].local_stabilization_operator
         # --------------------------------------------------------------------------------------------------------------
         # Local matrix
         # --------------------------------------------------------------------------------------------------------------
-        local_matrix = local_stiffness_form + local_stabilization_form
+        local_matrix = local_stiffness_form + local_stabilization_operator
         # --------------------------------------------------------------------------------------------------------------
         # Static condensation
         # --------------------------------------------------------------------------------------------------------------
@@ -258,7 +269,7 @@ def solve(
             m_faces_faces,
             v_cell,
             v_faces,
-        ) = Condensation.get_system_decomposition(local_matrix, local_external_forces, unknown, cell_basis)
+        ) = Condensation.get_system_decomposition(local_matrix, local_external_forces, unknown, cell_basis_l)
         # --------------------------------------------------------------------------------------------------------------
         # Static condensation
         # --------------------------------------------------------------------------------------------------------------
@@ -272,16 +283,16 @@ def solve(
         # --------------------------------------------------------------------------------------------------------------
         cell_faces_connectivity_matrix = cells_faces_connectivity_matrix[cell_index]
         for local_index_col, global_index_col in enumerate(cell_faces_connectivity_matrix):
-            g0c = global_index_col * face_basis.basis_dimension * unknown.field_dimension
-            g1c = (global_index_col + 1) * face_basis.basis_dimension * unknown.field_dimension
-            l0c = local_index_col * face_basis.basis_dimension * unknown.field_dimension
-            l1c = (local_index_col + 1) * face_basis.basis_dimension * unknown.field_dimension
+            g0c = global_index_col * face_basis_k.basis_dimension * unknown.field_dimension
+            g1c = (global_index_col + 1) * face_basis_k.basis_dimension * unknown.field_dimension
+            l0c = local_index_col * face_basis_k.basis_dimension * unknown.field_dimension
+            l1c = (local_index_col + 1) * face_basis_k.basis_dimension * unknown.field_dimension
             global_vector[g0c:g1c] += v_cond[l0c:l1c]
             for local_index_row, global_index_row in enumerate(cell_faces_connectivity_matrix):
-                g0r = global_index_row * face_basis.basis_dimension * unknown.field_dimension
-                g1r = (global_index_row + 1) * face_basis.basis_dimension * unknown.field_dimension
-                l0r = local_index_row * face_basis.basis_dimension * unknown.field_dimension
-                l1r = (local_index_row + 1) * face_basis.basis_dimension * unknown.field_dimension
+                g0r = global_index_row * face_basis_k.basis_dimension * unknown.field_dimension
+                g1r = (global_index_row + 1) * face_basis_k.basis_dimension * unknown.field_dimension
+                l0r = local_index_row * face_basis_k.basis_dimension * unknown.field_dimension
+                l1r = (local_index_row + 1) * face_basis_k.basis_dimension * unknown.field_dimension
                 global_matrix[g0r:g1r, g0c:g1c] += m_cond[l0r:l1r, l0c:l1c]
     # ------------------------------------------------------------------------------------------------------------------
     # Displacement enforcement through Lagrange multiplier
@@ -289,18 +300,18 @@ def solve(
     number_of_constrained_faces = 0
     # for boundary_name, nset in zip(nsets, nsets.values()):
     for boundary_name, nset in zip(nsets_faces, nsets_faces.values()):
-        print(boundary_name, nset)
+        # print(boundary_name, nset)
         displacement = boundary_conditions[boundary_name][0]
         for displacement_component in displacement:
             if not displacement_component is None:
                 number_of_constrained_faces += len(nset)
     lagrange_multiplyer_matrix = np.zeros(
         (
-            number_of_constrained_faces * face_basis.basis_dimension,
-            number_of_faces * unknown.field_dimension * face_basis.basis_dimension,
+            number_of_constrained_faces * face_basis_k.basis_dimension,
+            number_of_faces * unknown.field_dimension * face_basis_k.basis_dimension,
         )
     )
-    h_vector = np.zeros((number_of_constrained_faces * face_basis.basis_dimension,))
+    h_vector = np.zeros((number_of_constrained_faces * face_basis_k.basis_dimension,))
     iter_constrained_face = 0
     # for boundary_name, nset in zip(nsets, nsets.values()):
     for boundary_name, nset in zip(nsets_faces, nsets_faces.values()):
@@ -309,7 +320,7 @@ def solve(
             face_reference_frame_transformation_matrix = face.reference_frame_transformation_matrix
             # ----------------------------------------------------------------------------------------------------------
             m_psi_psi_face = Integration.get_face_mass_matrix_in_face(
-                face, face_basis, face_reference_frame_transformation_matrix
+                face, face_basis_k, face_basis_k, face_reference_frame_transformation_matrix
             )
             m_psi_psi_face_inv = np.linalg.inv(m_psi_psi_face)
             # ----------------------------------------------------------------------------------------------------------
@@ -317,7 +328,7 @@ def solve(
             for direction, displacement_component in enumerate(displacement):
                 if not displacement_component is None:
                     displacement_vector = Displacement(
-                        face, face_basis, face_reference_frame_transformation_matrix, displacement_component
+                        face, face_basis_k, face_reference_frame_transformation_matrix, displacement_component
                     ).displacement_vector
                     # if False:
                     #     print("hello")
@@ -328,37 +339,37 @@ def solve(
                     # --------------------------------------------------------------------------------------------------
                     displacement_vector = m_psi_psi_face_inv @ displacement_vector
                     # --------------------------------------------------------------------------------------------------
-                    l0 = iter_constrained_face * face_basis.basis_dimension
-                    l1 = (iter_constrained_face + 1) * face_basis.basis_dimension
+                    l0 = iter_constrained_face * face_basis_k.basis_dimension
+                    l1 = (iter_constrained_face + 1) * face_basis_k.basis_dimension
                     c0 = (
-                        face_global_index * unknown.field_dimension * face_basis.basis_dimension
-                        + direction * face_basis.basis_dimension
+                        face_global_index * unknown.field_dimension * face_basis_k.basis_dimension
+                        + direction * face_basis_k.basis_dimension
                     )
-                    c1 = (face_global_index * unknown.field_dimension * face_basis.basis_dimension) + (
+                    c1 = (face_global_index * unknown.field_dimension * face_basis_k.basis_dimension) + (
                         direction + 1
-                    ) * face_basis.basis_dimension
+                    ) * face_basis_k.basis_dimension
                     # --------------------------------------------------------------------------------------------------
-                    lagrange_multiplyer_matrix[l0:l1, c0:c1] += np.eye(face_basis.basis_dimension)
+                    lagrange_multiplyer_matrix[l0:l1, c0:c1] += np.eye(face_basis_k.basis_dimension)
                     # --------------------------------------------------------------------------------------------------
                     h_vector[l0:l1] += displacement_vector
                     iter_constrained_face += 1
-    print("h_vector : \n{}".format(h_vector))
-    print("lagrange_multiplyer_matrix : \n{}".format(lagrange_multiplyer_matrix))
+    # print("h_vector : \n{}".format(h_vector))
+    # print("lagrange_multiplyer_matrix : \n{}".format(lagrange_multiplyer_matrix))
     # ------------------------------------------------------------------------------------------------------------------
     double_lagrange = False
     # ------------------------------------------------------------------------------------------------------------------
     # If a single Lagrange multiplyier is used to enforce Dirichlet boundary conditions
     # ------------------------------------------------------------------------------------------------------------------
     if not double_lagrange:
-        global_vector_2 = np.zeros((total_system_size + number_of_constrained_faces * face_basis.basis_dimension,))
+        global_vector_2 = np.zeros((total_system_size + number_of_constrained_faces * face_basis_k.basis_dimension,))
         # --------------------------------------------------------------------------------------------------------------
         global_vector_2[:total_system_size] += global_vector
         global_vector_2[total_system_size:] += h_vector
         # --------------------------------------------------------------------------------------------------------------
         global_matrix_2 = np.zeros(
             (
-                total_system_size + number_of_constrained_faces * face_basis.basis_dimension,
-                total_system_size + number_of_constrained_faces * face_basis.basis_dimension,
+                total_system_size + number_of_constrained_faces * face_basis_k.basis_dimension,
+                total_system_size + number_of_constrained_faces * face_basis_k.basis_dimension,
             )
         )
         # --------------------------------------------------------------------------------------------------------------
@@ -370,7 +381,7 @@ def solve(
     # ------------------------------------------------------------------------------------------------------------------
     else:
         global_vector_2 = np.zeros(
-            (total_system_size + 2 * (number_of_constrained_faces * face_basis.basis_dimension),)
+            (total_system_size + 2 * (number_of_constrained_faces * face_basis_k.basis_dimension),)
         )
         # --------------------------------------------------------------------------------------------------------------
         l0 = 0
@@ -378,17 +389,17 @@ def solve(
         global_vector_2[l0:l1] += global_vector
         # --------------------------------------------------------------------------------------------------------------
         l0 = total_system_size
-        l1 = total_system_size + (number_of_constrained_faces * face_basis.basis_dimension)
+        l1 = total_system_size + (number_of_constrained_faces * face_basis_k.basis_dimension)
         global_vector_2[l0:l1] += h_vector
         # --------------------------------------------------------------------------------------------------------------
-        l0 = total_system_size + (number_of_constrained_faces * face_basis.basis_dimension)
-        l1 = total_system_size + 2 * (number_of_constrained_faces * face_basis.basis_dimension)
+        l0 = total_system_size + (number_of_constrained_faces * face_basis_k.basis_dimension)
+        l1 = total_system_size + 2 * (number_of_constrained_faces * face_basis_k.basis_dimension)
         global_vector_2[l0:l1] += h_vector
         # --------------------------------------------------------------------------------------------------------------
         global_matrix_2 = np.zeros(
             (
-                total_system_size + 2 * (number_of_constrained_faces * face_basis.basis_dimension),
-                total_system_size + 2 * (number_of_constrained_faces * face_basis.basis_dimension),
+                total_system_size + 2 * (number_of_constrained_faces * face_basis_k.basis_dimension),
+                total_system_size + 2 * (number_of_constrained_faces * face_basis_k.basis_dimension),
             )
         )
         # --------------------------------------------------------------------------------------------------------------
@@ -401,60 +412,60 @@ def solve(
         l0 = 0
         l1 = total_system_size
         c0 = total_system_size
-        c1 = total_system_size + (number_of_constrained_faces * face_basis.basis_dimension)
+        c1 = total_system_size + (number_of_constrained_faces * face_basis_k.basis_dimension)
         global_matrix_2[l0:l1, c0:c1] += lagrange_multiplyer_matrix.T
         # --------------------------------------------------------------------------------------------------------------
         l0 = 0
         l1 = total_system_size
-        c0 = total_system_size + (number_of_constrained_faces * face_basis.basis_dimension)
-        c1 = total_system_size + 2 * (number_of_constrained_faces * face_basis.basis_dimension)
+        c0 = total_system_size + (number_of_constrained_faces * face_basis_k.basis_dimension)
+        c1 = total_system_size + 2 * (number_of_constrained_faces * face_basis_k.basis_dimension)
         global_matrix_2[l0:l1, c0:c1] += lagrange_multiplyer_matrix.T
         # --------------------------------------------------------------------------------------------------------------
         l0 = total_system_size
-        l1 = total_system_size + (number_of_constrained_faces * face_basis.basis_dimension)
+        l1 = total_system_size + (number_of_constrained_faces * face_basis_k.basis_dimension)
         c0 = 0
         c1 = total_system_size
         global_matrix_2[l0:l1, c0:c1] += lagrange_multiplyer_matrix
         # --------------------------------------------------------------------------------------------------------------
-        l0 = total_system_size + (number_of_constrained_faces * face_basis.basis_dimension)
-        l1 = total_system_size + 2 * (number_of_constrained_faces * face_basis.basis_dimension)
+        l0 = total_system_size + (number_of_constrained_faces * face_basis_k.basis_dimension)
+        l1 = total_system_size + 2 * (number_of_constrained_faces * face_basis_k.basis_dimension)
         c0 = 0
         c1 = total_system_size
         global_matrix_2[l0:l1, c0:c1] += lagrange_multiplyer_matrix
         # --------------------------------------------------------------------------------------------------------------
-        id_lag = np.eye(number_of_constrained_faces * face_basis.basis_dimension)
+        id_lag = np.eye(number_of_constrained_faces * face_basis_k.basis_dimension)
         # --------------------------------------------------------------------------------------------------------------
         l0 = total_system_size
-        l1 = total_system_size + (number_of_constrained_faces * face_basis.basis_dimension)
+        l1 = total_system_size + (number_of_constrained_faces * face_basis_k.basis_dimension)
         c0 = total_system_size
-        c1 = total_system_size + (number_of_constrained_faces * face_basis.basis_dimension)
+        c1 = total_system_size + (number_of_constrained_faces * face_basis_k.basis_dimension)
         global_matrix_2[l0:l1, c0:c1] += id_lag
         # --------------------------------------------------------------------------------------------------------------
         l0 = total_system_size
-        l1 = total_system_size + (number_of_constrained_faces * face_basis.basis_dimension)
-        c0 = total_system_size + (number_of_constrained_faces * face_basis.basis_dimension)
-        c1 = total_system_size + 2 * (number_of_constrained_faces * face_basis.basis_dimension)
+        l1 = total_system_size + (number_of_constrained_faces * face_basis_k.basis_dimension)
+        c0 = total_system_size + (number_of_constrained_faces * face_basis_k.basis_dimension)
+        c1 = total_system_size + 2 * (number_of_constrained_faces * face_basis_k.basis_dimension)
         global_matrix_2[l0:l1, c0:c1] -= id_lag
         # --------------------------------------------------------------------------------------------------------------
-        l0 = total_system_size + (number_of_constrained_faces * face_basis.basis_dimension)
-        l1 = total_system_size + 2 * (number_of_constrained_faces * face_basis.basis_dimension)
+        l0 = total_system_size + (number_of_constrained_faces * face_basis_k.basis_dimension)
+        l1 = total_system_size + 2 * (number_of_constrained_faces * face_basis_k.basis_dimension)
         c0 = total_system_size
-        c1 = total_system_size + (number_of_constrained_faces * face_basis.basis_dimension)
+        c1 = total_system_size + (number_of_constrained_faces * face_basis_k.basis_dimension)
         global_matrix_2[l0:l1, c0:c1] -= id_lag
         # --------------------------------------------------------------------------------------------------------------
-        l0 = total_system_size + (number_of_constrained_faces * face_basis.basis_dimension)
-        l1 = total_system_size + 2 * (number_of_constrained_faces * face_basis.basis_dimension)
-        c0 = total_system_size + (number_of_constrained_faces * face_basis.basis_dimension)
-        c1 = total_system_size + 2 * (number_of_constrained_faces * face_basis.basis_dimension)
+        l0 = total_system_size + (number_of_constrained_faces * face_basis_k.basis_dimension)
+        l1 = total_system_size + 2 * (number_of_constrained_faces * face_basis_k.basis_dimension)
+        c0 = total_system_size + (number_of_constrained_faces * face_basis_k.basis_dimension)
+        c1 = total_system_size + 2 * (number_of_constrained_faces * face_basis_k.basis_dimension)
         global_matrix_2[l0:l1, c0:c1] += id_lag
     # print("global_matrix_2 : \n{}".format(global_matrix_2))
-    print("global_vector_2 : \n{}".format(global_vector_2))
+    # print("global_vector_2 : \n{}".format(global_vector_2))
     # ------------------------------------------------------------------------------------------------------------------
     # Solving the global system for faces unknowns
     # ------------------------------------------------------------------------------------------------------------------
     # print("global_matrix : \n{}".format(global_matrix_2))
     global_solution = np.linalg.solve(global_matrix_2, global_vector_2)
-    print("global_solution : \n{}".format(global_solution))
+    # print("global_solution : \n{}".format(global_solution))
     # ------------------------------------------------------------------------------------------------------------------
     # Getting the number of vertices
     # ------------------------------------------------------------------------------------------------------------------
@@ -465,6 +476,7 @@ def solve(
     number_of_vertices = vertices.shape[0]
     # ------------------------------------------------------------------------------------------------------------------
     quadrature_points = np.zeros((number_of_quadrature_points, unknown.problem_dimension))
+    quadrature_weights = np.zeros((number_of_quadrature_points,))
     unknowns_at_vertices = [np.zeros((number_of_vertices,)) for i in range(unknown.field_dimension)]
     f_unknowns_at_vertices = [np.zeros((number_of_vertices,)) for i in range(unknown.field_dimension)]
     unknowns_at_quadrature_points = [np.zeros((number_of_quadrature_points,)) for i in range(unknown.field_dimension)]
@@ -481,18 +493,18 @@ def solve(
         face_vertices_connectivity_matrix = faces_vertices_connectivity_matrix[face_index]
         face_vertices = vertices[face_vertices_connectivity_matrix]
         face = faces[face_index]
-        l0 = face_index * unknown.field_dimension * face_basis.basis_dimension
-        l1 = (face_index + 1) * unknown.field_dimension * face_basis.basis_dimension
+        l0 = face_index * unknown.field_dimension * face_basis_k.basis_dimension
+        l1 = (face_index + 1) * unknown.field_dimension * face_basis_k.basis_dimension
         x_face = global_solution[l0:l1]
         for i, vertex in enumerate(face_vertices):
             vertex_in_face = Face.get_points_in_face_reference_frame(vertex, face.reference_frame_transformation_matrix)
             centroid_in_face = Face.get_points_in_face_reference_frame(
                 face.centroid, face.reference_frame_transformation_matrix
             )
-            v = face_basis.get_phi_vector(vertex_in_face, centroid_in_face, face.volume)
+            v = face_basis_k.get_phi_vector(vertex_in_face, centroid_in_face, face.diameter)
             for direction in range(unknown.field_dimension):
-                l0 = direction * face_basis.basis_dimension
-                l1 = (direction + 1) * face_basis.basis_dimension
+                l0 = direction * face_basis_k.basis_dimension
+                l1 = (direction + 1) * face_basis_k.basis_dimension
                 vertex_value_vector = v * x_face[l0:l1]
                 global_index = face_vertices_connectivity_matrix[i]
                 l0 = global_index
@@ -501,6 +513,7 @@ def solve(
                 f_vertices_weights[l0:l1] += 1.0
     # ==================================================================================================================
     # ==================================================================================================================
+    x_cell_list, x_faces_list = [], []
     for cell_index in cells_indices:
         # --------------------------------------------------------------------------------------------------------------
         # Getting faces unknowns
@@ -508,28 +521,30 @@ def solve(
         local_cell = cells[cell_index]
         cell_faces_connectivity_matrix = cells_faces_connectivity_matrix[cell_index]
         local_faces = [faces[i] for i in cell_faces_connectivity_matrix]
-        faces_unknown_dimension = len(local_faces) * face_basis.basis_dimension * unknown.field_dimension
+        faces_unknown_dimension = len(local_faces) * face_basis_k.basis_dimension * unknown.field_dimension
         x_faces = np.zeros((faces_unknown_dimension,))
         for local_index_col, global_index_col in enumerate(cell_faces_connectivity_matrix):
-            g0c = global_index_col * face_basis.basis_dimension * unknown.field_dimension
-            g1c = (global_index_col + 1) * face_basis.basis_dimension * unknown.field_dimension
-            l0c = local_index_col * face_basis.basis_dimension * unknown.field_dimension
-            l1c = (local_index_col + 1) * face_basis.basis_dimension * unknown.field_dimension
+            g0c = global_index_col * face_basis_k.basis_dimension * unknown.field_dimension
+            g1c = (global_index_col + 1) * face_basis_k.basis_dimension * unknown.field_dimension
+            l0c = local_index_col * face_basis_k.basis_dimension * unknown.field_dimension
+            l1c = (local_index_col + 1) * face_basis_k.basis_dimension * unknown.field_dimension
             x_faces[l0c:l1c] += global_solution[g0c:g1c]
         # --------------------------------------------------------------------------------------------------------------
         # Decondensation : getting cell unknowns
         # --------------------------------------------------------------------------------------------------------------
         (v_cell, m_cell_faces, m_cell_cell_inv) = stored_matrices[cell_index]
         x_cell = Condensation.get_cell_unknown(m_cell_cell_inv, m_cell_faces, v_cell, x_faces)
+        x_cell_list.append(x_cell)
+        x_faces_list.append(x_faces)
         # --------------------------------------------------------------------------------------------------------------
         cell_vertices_connectivity_matrix = cells_vertices_connectivity_matrix[cell_index]
         local_vertices = vertices[cell_vertices_connectivity_matrix]
         # --------------------------------------------------------------------------------------------------------------
         for i, vertex in enumerate(local_vertices):
-            v = cell_basis.get_phi_vector(vertex, local_cell.centroid, local_cell.volume)
+            v = cell_basis_l.get_phi_vector(vertex, local_cell.centroid, local_cell.diameter)
             for direction in range(unknown.field_dimension):
-                l0 = direction * cell_basis.basis_dimension
-                l1 = (direction + 1) * cell_basis.basis_dimension
+                l0 = direction * cell_basis_l.basis_dimension
+                l1 = (direction + 1) * cell_basis_l.basis_dimension
                 vertex_value_vector = v * x_cell[l0:l1]
                 global_index = cell_vertices_connectivity_matrix[i]
                 l0 = global_index
@@ -538,15 +553,16 @@ def solve(
                 vertices_weights[l0:l1] += 1.0
         # --------------------------------------------------------------------------------------------------------------
         for i, quadrature_point in enumerate(local_cell.quadrature_points):
-            v = cell_basis.get_phi_vector(quadrature_point, local_cell.centroid, local_cell.volume)
+            v = cell_basis_l.get_phi_vector(quadrature_point, local_cell.centroid, local_cell.diameter)
             for direction in range(unknown.field_dimension):
-                l0 = direction * cell_basis.basis_dimension
-                l1 = (direction + 1) * cell_basis.basis_dimension
+                l0 = direction * cell_basis_l.basis_dimension
+                l1 = (direction + 1) * cell_basis_l.basis_dimension
                 vertex_value_vector = v * x_cell[l0:l1]
                 l0 = quadrature_point_count
                 l1 = quadrature_point_count + 1
                 unknowns_at_quadrature_points[direction][l0:l1] += np.sum(vertex_value_vector)
                 quadrature_points[quadrature_point_count] += quadrature_point
+                quadrature_weights[quadrature_point_count] += local_cell.quadrature_weights[i]
             quadrature_point_count += 1
     # ------------------------------------------------------------------------------------------------------------------
     # Global matrix
@@ -556,8 +572,9 @@ def solve(
         f_unknowns_at_vertices[direction] = f_unknowns_at_vertices[direction] / f_vertices_weights
     return (
         (vertices, unknowns_at_vertices),
-        (quadrature_points, unknowns_at_quadrature_points),
+        (quadrature_points, unknowns_at_quadrature_points, quadrature_weights),
         (vertices, f_unknowns_at_vertices),
+        (x_cell_list, x_faces_list),
         # unknowns_at_faces
     )
 
@@ -583,7 +600,14 @@ def is_polynomial_order_consistent(face_polynomial_order: int, cell_polynomial_o
 
 
 def get_operator(
-    operator_type: str, cell: Cell, faces: List[Face], cell_basis: Basis, face_basis: Basis, unknown: Unknown,
+    operator_type: str,
+    cell: Cell,
+    faces: List[Face],
+    cell_basis_l: Basis,
+    cell_basis_k: Basis,
+    cell_basis_k1: Basis,
+    face_basis_k: Basis,
+    unknown: Unknown,
 ):
     """
         ================================================================================================================
@@ -599,7 +623,9 @@ def get_operator(
         ================================================================================================================
         """
     if operator_type == "HDG":
-        op = HDG(cell, faces, cell_basis, face_basis, unknown)
+        op = HDG(cell, faces, cell_basis_l, cell_basis_k, face_basis_k, unknown)
+    elif operator_type == "HHO":
+        op = HHO(cell, faces, cell_basis_l, cell_basis_k, cell_basis_k1, face_basis_k, unknown)
     else:
         raise NameError("The specified operator does not exist")
     return op

@@ -64,6 +64,8 @@ class Unknown:
         self.symmetric_gradient = symmetric_gradient
         self.cell_polynomial_order = cell_polynomial_order
         self.face_polynomial_order = face_polynomial_order
-        self.integration_order = 2 * max(face_polynomial_order, cell_polynomial_order)
+        # self.integration_order = 2 * max(face_polynomial_order, cell_polynomial_order)
+        self.integration_order = max(2 * (face_polynomial_order + 1), 2 * cell_polynomial_order)
+        self.integration_order = 2 * (face_polynomial_order + 1)
         # self.symmetric_gradient = symmetric_gradient
         # self.field_dimension = field_dimension

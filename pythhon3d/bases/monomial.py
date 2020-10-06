@@ -153,7 +153,7 @@ class ScaledMonomial(Basis):
                         break
         return gradient_operator
 
-    def get_phi_vector(self, point: Mat, centroid: Mat, volume: float,) -> Mat:
+    def get_phi_vector(self, point: Mat, centroid: Mat, diameter: float,) -> Mat:
         """
         ================================================================================================================
         Method :
@@ -165,12 +165,12 @@ class ScaledMonomial(Basis):
         - point : a point in the euclidian space, denoted by a vector gathering its coordinates in the euclidian space
         - centroid : the centroid of the domain in the euclidian space on which the polynomial acts, denoted by a
         vector gathering its coordinates in the euclidian space
-        - volume : the volume of the domain, a scalar value
+        - diameter : the diameter of the domain, a scalar value
         ================================================================================================================
         Exemple :
         ================================================================================================================
         Let the unite square T = [0,1]*[0,1] in R^2, A = (0.1, 0.4) a point in T, and
-        B = (0.5, 0.5) the centroid of T. The volume of T is 1.
+        B = (0.5, 0.5) the centroid of T. The diameter of T is 1.
         Then, the polynomial valued vector of A in the scaled monomial basis of order 2
         in T is :
         phi_vector = | ((0.1-0.5)/1.)^0*((0.4-0.5)/1.)^0 |
@@ -187,11 +187,11 @@ class ScaledMonomial(Basis):
         """
         point_matrix = np.tile(point, (self.basis_dimension, 1,),)
         centroid_matrix = np.tile(centroid, (self.basis_dimension, 1,),)
-        phi_matrix = ((point_matrix - centroid_matrix) / volume) ** self.exponents
+        phi_matrix = ((point_matrix - centroid_matrix) / diameter) ** self.exponents
         phi_vector = np.prod(phi_matrix, axis=1,)
         return phi_vector
 
-    def get_d_phi_vector(self, point: Mat, centroid: Mat, volume: float, dx: int,) -> Mat:
+    def get_d_phi_vector(self, point: Mat, centroid: Mat, diameter: float, dx: int,) -> Mat:
         """
         ================================================================================================================
         Method :
@@ -204,13 +204,13 @@ class ScaledMonomial(Basis):
         - point : a point in the euclidian space, denoted by a vector gathering its coordinates in the euclidian space
         - centroid : the centroid of the domain in the euclidian space on which the polynomial acts, denoted by a
         vector gathering its coordinates in the euclidian space
-        - volume : the volume of the domain, a scalar value
+        - diameter : the diameter of the domain, a scalar value
         - dx : the derivative variable in the euclidian space
         ================================================================================================================
         Exemple :
         ================================================================================================================
         Let the unite square T = [0,1]*[0,1] in R^2, A = (0.1, 0.4) a point in T, and
-        B = (0.5, 0.5) the centroid of T. The volume of T is 1.
+        B = (0.5, 0.5) the centroid of T. The diameter of T is 1.
         Then, the polynomial valued vector of A in the derivative of the scaled monomial
         basis of order 2 in T is :
         d_phi_vector = | 0*((0.1-0.5)/1.)^0*((0.4-0.5)/1.)^0     |
@@ -220,7 +220,7 @@ class ScaledMonomial(Basis):
                        | 1*((0.1-0.5)/1.)^(1-1)*((0.4-0.5)/1.)^1 |
                        | 2*((0.1-0.5)/1.)^(2-1)*((0.4-0.5)/1.)^0 |
         Or equivalently :
-        d_phi_vector = (1/volume) @ gradient_operator @ phi_vector
+        d_phi_vector = (1/diameter) @ gradient_operator @ phi_vector
         ================================================================================================================
         Returns :
         ================================================================================================================
@@ -228,10 +228,10 @@ class ScaledMonomial(Basis):
         """
         grad_dx = self.conformal_gradients[dx]
         # print("grad_dx : {}".format(grad_dx))
-        phi_vector = self.get_phi_vector(point, centroid, volume)
+        phi_vector = self.get_phi_vector(point, centroid, diameter)
         # print("phi_vector : {}".format(phi_vector))
         # print("res : {}".format(grad_dx @ phi_vector.T))
-        d_phi_vector = (1.0 / volume) * (grad_dx @ phi_vector.T)
+        d_phi_vector = (1.0 / diameter) * (grad_dx @ phi_vector.T)
         # print("d_phi_vector : {}".format(d_phi_vector))
         # print("---")
         return d_phi_vector

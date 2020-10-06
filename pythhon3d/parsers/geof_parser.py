@@ -179,7 +179,7 @@ def parse_geof_file(geof_file_path):
                     cell_face_connectivity_matrix.append(tags.index(tag))
             cells_faces_connectivity_matrix.append(cell_face_connectivity_matrix)
         # --------------------------------------------------------------------------------------------------------------
-        print("HEEERE : \n{}, {}".format(len(flags), len(faces_vertices_connectivity_matrix)))
+        # print("HEEERE : \n{}, {}".format(len(flags), len(faces_vertices_connectivity_matrix)))
         nsets_faces = {}
         for boundary_name in nsets:
             nsets_faces[boundary_name] = []
@@ -187,14 +187,14 @@ def parse_geof_file(geof_file_path):
             if not local_flags is None:
                 for flag in local_flags:
                     nsets_faces[flag].append(i)
-        print("problem_dimension :\n {}\n".format(problem_dimension))
-        print("vertices :\n {}\n".format(vertices))
-        print("cells_vertices_connectivity_matrix :\n {}\n".format(cells_vertices_connectivity_matrix))
-        print("faces_vertices_connectivity_matrix :\n {}\n".format(faces_vertices_connectivity_matrix))
-        print("cells_faces_connectivity_matrix :\n {}\n".format(cells_faces_connectivity_matrix))
-        print("nsets :\n {}\n".format(nsets))
-        print("flags :\n {}\n".format(flags))
-        print("nsets_faces :\n {}\n".format(nsets_faces))
+        # print("problem_dimension :\n {}\n".format(problem_dimension))
+        # print("vertices :\n {}\n".format(vertices))
+        # print("cells_vertices_connectivity_matrix :\n {}\n".format(cells_vertices_connectivity_matrix))
+        # print("faces_vertices_connectivity_matrix :\n {}\n".format(faces_vertices_connectivity_matrix))
+        # print("cells_faces_connectivity_matrix :\n {}\n".format(cells_faces_connectivity_matrix))
+        # print("nsets :\n {}\n".format(nsets))
+        # print("flags :\n {}\n".format(flags))
+        # print("nsets_faces :\n {}\n".format(nsets_faces))
         return (
             problem_dimension,
             vertices,

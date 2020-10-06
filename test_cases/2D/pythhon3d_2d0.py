@@ -25,14 +25,14 @@ mesh_file = "/Users/davidsiedel/Projects/PytHHOn3D/meshes/mesh2D25.geof"
 # mesh_file = "/Users/davidsiedel/Projects/PytHHOn3D/meshes/triangles_test.geof"
 operator_type = "HDG"
 #
-pressure_left = [lambda x: 0.0]
-pressure_right = [lambda x: 0.0]
-pressure_top = [lambda x: 0.0]
-pressure_bottom = [lambda x: 0.0]
+pressure_left = [None]
+pressure_right = [None]
+pressure_top = [None]
+pressure_bottom = [None]
 #
-displacement_left = [None]
-displacement_right = [None]
-displacement_top = [lambda x: 1.0]
+displacement_left = [lambda x: 0.0]
+displacement_right = [lambda x: 0.0]
+displacement_top = [lambda x: 0.0]
 displacement_bottom = [lambda x: 0.0]
 #
 
@@ -57,6 +57,8 @@ load = [
 load = [
     lambda x: -10.0,
 ]
+#
+load = [lambda x: np.sin(2.0 * np.pi * x[0])]
 #
 boundary_conditions = {
     "RIGHT": (displacement_right, pressure_right),
@@ -86,8 +88,9 @@ tangent_matrices = [np.eye(2) for i in range(len(cells))]
 # ------------------------------------------------------------------------------------------------------------------
 (
     (vertices, unknowns_at_vertices),
-    (quadrature_points, unknowns_at_quadrature_points),
-    (f_vertices, f_unknowns_at_vertices),
+    (quadrature_points, unknowns_at_quadrature_points, quadrature_weights),
+    (vertices, f_unknowns_at_vertices),
+    (x_cell_list, x_faces_list),
 ) = solve(
     vertices,
     faces,

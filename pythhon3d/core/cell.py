@@ -36,7 +36,7 @@ class Cell(Domain):
             c = Segment(vertices, polynomial_order)
             centroid = c.centroid
             volume = c.volume
-            diameter = None
+            diameter = c.diameter
             quadrature_points = c.quadrature_points
             quadrature_weights = c.quadrature_weights
             del c
@@ -44,7 +44,7 @@ class Cell(Domain):
             c = Triangle(vertices, polynomial_order)
             centroid = c.centroid
             volume = c.volume
-            diameter = None
+            diameter = c.diameter
             quadrature_points = c.quadrature_points
             quadrature_weights = c.quadrature_weights
             del c
@@ -52,7 +52,7 @@ class Cell(Domain):
             c = Polygon(vertices, polynomial_order)
             centroid = c.centroid
             volume = c.volume
-            diameter = None
+            diameter = c.diameter
             quadrature_points = c.quadrature_points
             quadrature_weights = c.quadrature_weights
             del c
@@ -60,7 +60,7 @@ class Cell(Domain):
             c = Tetrahedron(vertices, polynomial_order)
             centroid = c.centroid
             volume = c.volume
-            diameter = None
+            diameter = c.diameter
             quadrature_points = c.quadrature_points
             quadrature_weights = c.quadrature_weights
             del c
@@ -68,7 +68,7 @@ class Cell(Domain):
             c = Polyhedron(vertices, connectivity_matrix, polynomial_order)
             centroid = c.centroid
             volume = c.volume
-            diameter = None
+            diameter = c.diameter
             quadrature_points = c.quadrature_points
             quadrature_weights = c.quadrature_weights
             del c

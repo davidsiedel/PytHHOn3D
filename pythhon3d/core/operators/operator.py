@@ -12,7 +12,7 @@ from numpy import ndarray as Mat
 
 class Operator:
     def __init__(
-        self, local_gradient_operator: Mat, local_stabilization_form: Mat, local_mass_operator: Mat,
+        self, local_gradient_operator: Mat, local_stabilization_operator: Mat, local_mass_operator: Mat,
     ):
         """
         ================================================================================================================
@@ -29,7 +29,7 @@ class Operator:
         
         """
         self.local_gradient_operator = local_gradient_operator
-        self.local_stabilization_form = local_stabilization_form
+        self.local_stabilization_operator = local_stabilization_operator
         self.local_mass_operator = local_mass_operator
 
     def get_local_problem_size(self, faces: List[Face], cell_basis: Basis, face_basis: Basis, unknown: Unknown):
@@ -98,7 +98,6 @@ class Operator:
         # 2d faces in 3d cells
         # --------------------------------------------------------------------------------------------------------------
         if problem_dimension == 3:
-            # swaped_reference_frame_transformation_matrix = np.array([p[1], p[0], -p[2]])
             swaped_reference_frame_transformation_matrix = np.array([p[0], p[1], -p[2]])
         # --------------------------------------------------------------------------------------------------------------
         # 1d faces in 2d cells
@@ -109,7 +108,7 @@ class Operator:
         # 0d faces in 1d cells
         # --------------------------------------------------------------------------------------------------------------
         if problem_dimension == 1:
-            swaped_reference_frame_transformation_matrix = p
+            swaped_reference_frame_transformation_matrix = np.array([-p[0]])
         return swaped_reference_frame_transformation_matrix
 
     @staticmethod

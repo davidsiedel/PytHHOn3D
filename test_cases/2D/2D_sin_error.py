@@ -1,6 +1,16 @@
 import argparse
 import numpy as np
+from matplotlib import rc
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
+import matplotlib.cbook as cbook
+
+import matplotlib.cm as cm
+import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
+
+rc("font", **{"family": "sans-serif", "sans-serif": ["Helvetica"], "size": 12})
+rc("text", usetex=True)
 
 from test_cases import context
 
@@ -15,25 +25,34 @@ from core.operators.hdg import HDG
 
 from pythhon3d import build, solve
 
-d = 1
+d = 2
 face_polynomial_order = 1
 cell_polynomial_order = 2
 field_dimension = 1
-stabilization_parameter = 1.0e5  # K2
-mesh_file = "/Users/davidsiedel/Projects/PytHHOn3D/meshes/c1d2.geof"
+stabilization_parameter = 1.0  # K2
+# stabilization_parameter = 1000000.0  # K2
+mesh_file = "/Users/davidsiedel/Projects/PytHHOn3D/meshes/mesh2D25.geof"
+mesh_file = "/Users/davidsiedel/Projects/PytHHOn3D/meshes/2D/25.geof"
+# mesh_file = "/Users/davidsiedel/Projects/PytHHOn3D/meshes/triangles_test.geof"
 operator_type = "HDG"
+operator_type = "HHO"
 #
-pressure_left = [lambda x: 0.0]
-pressure_right = [lambda x: 0.0]
+pressure_left = [None]
+pressure_right = [None]
+pressure_top = [None]
+pressure_bottom = [None]
 #
 displacement_left = [lambda x: 0.0]
 displacement_right = [lambda x: 0.0]
+displacement_top = [None]
+displacement_bottom = [None]
 #
 load = [lambda x: np.sin(2.0 * np.pi * x[0])]
-#
 boundary_conditions = {
     "RIGHT": (displacement_right, pressure_right),
     "LEFT": (displacement_left, pressure_left),
+    "TOP": (displacement_top, pressure_top),
+    "BOTTOM": (displacement_bottom, pressure_bottom),
 }
 # ------------------------------------------------------------------------------------------------------------------
 (
@@ -45,15 +64,23 @@ boundary_conditions = {
     cells_vertices_connectivity_matrix,
     faces_vertices_connectivity_matrix,
     nsets,
-    cell_basis,
-    face_basis,
+    nsets_faces,
+    cell_basis_l,
+    cell_basis_k,
+    face_basis_k,
     unknown,
 ) = build(mesh_file, field_dimension, face_polynomial_order, cell_polynomial_order, operator_type)
 # ------------------------------------------------------------------------------------------------------------------
 d = unknown.problem_dimension
-tangent_matrices = [np.eye(d ** 2) for i in range(len(cells))]
+tangent_matrices = [np.eye(2) for i in range(len(cells))]
+# tangent_matrices = [np.array([[1.0, 0.0], [0.0, 1.0]]) for i in range(len(cells))]
 # ------------------------------------------------------------------------------------------------------------------
-(vertices, unknowns_at_vertices), (quadrature_points, unknowns_at_quadrature_points) = solve(
+(
+    (vertices, unknowns_at_vertices),
+    (quadrature_points, unknowns_at_quadrature_points, quadrature_weights),
+    (vertices, f_unknowns_at_vertices),
+    (x_cell_list, x_faces_list),
+) = solve(
     vertices,
     faces,
     cells,
@@ -62,8 +89,10 @@ tangent_matrices = [np.eye(d ** 2) for i in range(len(cells))]
     cells_vertices_connectivity_matrix,
     faces_vertices_connectivity_matrix,
     nsets,
-    cell_basis,
-    face_basis,
+    nsets_faces,
+    cell_basis_l,
+    cell_basis_k,
+    face_basis_k,
     unknown,
     tangent_matrices,
     stabilization_parameter,
@@ -71,16 +100,18 @@ tangent_matrices = [np.eye(d ** 2) for i in range(len(cells))]
     load,
 )
 # ------------------------------------------------------------------------------------------------------------------
-x_axis_v = [vertices[i] for i in range(vertices.shape[0])]
-y_axis_v = [unknowns_at_vertices[0][i] for i in range(unknowns_at_vertices[0].shape[0])]
-x_axis_q = [quadrature_points[i] for i in range(quadrature_points.shape[0])]
-y_axis_q = [unknowns_at_quadrature_points[0][i] for i in range(unknowns_at_quadrature_points[0].shape[0])]
-plt.plot(x_axis_v, y_axis_v, label="HHO vertices")
-# plt.plot(vertices, xf, label="HHO faces")
-plt.plot(x_axis_q, y_axis_q, label="HHO quad")
-plt.plot(x_axis_v, [-(1.0 / (2.0 * np.pi) ** 2) * load[0](x) for x in x_axis_v], label="analytical")
-# for segment in [(x_axis_v[i-1], x_axis_v[i]) for i in range(1, len(x_axis_v))]:
-# plt.plot(x_axis_v, [((x ** 4) / 12.0 - (x ** 3) / 6.0) for x in x_axis_v], label="analytical")
-# plt.plot(x_axis_v, [0.1 * x for x in x_axis_v], label="analytical")
-plt.legend()
+
+col_levels = 10
+# vmaxx = 0.032
+# vminn = -0.032
+x, y = quadrature_points.T
+# levels = np.linspace(vminn, vmaxx, col_levels)
+error = np.array(
+    (unknowns_at_quadrature_points[0] - np.array([-(1.0 / (2.0 * np.pi) ** 2) * (np.sin(2.0 * np.pi * X)) for X in x]))
+)
+error = error / 0.032
+plt.tricontourf(x, y, error, cmap=cm.binary)
+plt.xlabel("map of the domain $\Omega$")
+cbar = plt.colorbar()
+cbar.set_label("HHO error", rotation=270, labelpad=15.0)
 plt.show()
