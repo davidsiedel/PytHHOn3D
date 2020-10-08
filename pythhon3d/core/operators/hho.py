@@ -56,7 +56,7 @@ class HHO(Operator):
         unknown: Unknown,
     ) -> Mat:
         # --------------------------------------------------------------------------------------------------------------
-        # Getting the local problme size depending on the problem dimension and the field dimension
+        # Getting the local problem size depending on the problem dimension and the field dimension
         # --------------------------------------------------------------------------------------------------------------
         local_problem_size = self.get_local_problem_size(faces, cell_basis_l, face_basis_k, unknown)
         # --------------------------------------------------------------------------------------------------------------
@@ -212,21 +212,23 @@ class HHO(Operator):
                 local_reconstruction_operator[r0:r1, c0_T:c1_T] += m_cell_grad_phi_k1_grad_phi_l
         # --------------------------------------------------------------------------------------------------------------
         for i in directions:
+            # a_sum = np.zeros((local_problem_size,))
+            # for i_sum in directions:
             r0 = i * cell_basis_k1.basis_dimension
             r1 = (i + 1) * cell_basis_k1.basis_dimension
             m_cell_grad_phi_k1_grad_phi_k1_sum_inv = np.linalg.inv(m_cell_grad_phi_k1_grad_phi_k1_sum[1:, 1:])
             local_reconstruction_operator[r0 + 1 : r1, :] = (
                 m_cell_grad_phi_k1_grad_phi_k1_sum_inv @ local_reconstruction_operator[r0 + 1 : r1, :]
             )
-            # ----------------------------------------------------------------------------------------------------------
+            # ------------------------------------------------------------------------------------------------------
             cell_integration_vector_k1 = Integration.get_cell_integration_vector(cell, cell_basis_k1)
             cell_integration_vector_l = Integration.get_cell_integration_vector(cell, cell_basis_l)
-            # ----------------------------------------------------------------------------------------------------------
+            # ------------------------------------------------------------------------------------------------------
             m_mat = np.zeros((cell_basis_l.basis_dimension, local_problem_size))
             c0_m = i * cell_basis_l.basis_dimension
             c1_m = (i + 1) * cell_basis_l.basis_dimension
             m_mat[:, c0_m:c1_m] += np.eye(cell_basis_l.basis_dimension)
-            # ----------------------------------------------------------------------------------------------------------
+            # ------------------------------------------------------------------------------------------------------
             a = (
                 cell_integration_vector_l @ m_mat
                 - cell_integration_vector_k1[1:] @ local_reconstruction_operator[r0 + 1 : r1, :]
@@ -351,24 +353,3 @@ class HHO(Operator):
                 h_f = 1.0 / face.diameter
                 local_stabilization_operator += h_f * m_stab_face_jump.T @ m_face_psi_k_psi_k_inv @ m_stab_face_jump
         return local_stabilization_operator
-
-    def get_line_from_indices(self, i: int, j: int, unknown: Unknown) -> int:
-        """
-        ================================================================================================================
-        Description :
-        ================================================================================================================
-        
-        ================================================================================================================
-        Parameters :
-        ================================================================================================================
-        
-        ================================================================================================================
-        Exemple :
-        ================================================================================================================
-        """
-        for line, index in enumerate(unknown.indices):
-            if index[0] == i and index[1] == j:
-                return line
-            if unknown.symmetric_gradient and index[0] == j and index[1] == i:
-                return line
-        raise ValueError("ATtention")

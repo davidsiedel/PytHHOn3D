@@ -23,37 +23,6 @@ from core.integration import Integration
 import argparse
 
 
-def read_input_data():
-    """
-    ====================================================================================================================
-    Description :
-    ====================================================================================================================
-    
-    ====================================================================================================================
-    Parameters :
-    ====================================================================================================================
-
-    ====================================================================================================================
-    Exemple :
-    ====================================================================================================================
-    """
-    parser = argparse.ArgumentParser()
-    # ------------------------------------------------------------------------------------------------------------------
-    parser.add_argument("-msh", "--mesh_file", help="mesh file path")
-    parser.add_argument("-fd", "--field_dimension", help="output dimension of the field")
-    parser.add_argument("-op", "--operator_type", help="type of non-conformal method")
-    parser.add_argument("-kc", "--cell_polynomial_order", help="polynomial order in cell")
-    parser.add_argument("-kf", "--face_polynomial_order", help="polynomial order in face")
-    # ------------------------------------------------------------------------------------------------------------------
-    mesh_file = args.msh
-    field_dimension = args.fd
-    operator_type = args.op
-    cell_polynomial_order = args.kc
-    face_polynomial_order = args.kf
-    # ------------------------------------------------------------------------------------------------------------------
-    return mesh_file, field_dimension, face_polynomial_order, cell_polynomial_order, operator_type
-
-
 def build(
     mesh_file: str, field_dimension: int, face_polynomial_order: int, cell_polynomial_order: int, operator_type: str,
 ):
@@ -103,6 +72,7 @@ def build(
     cell_basis_l = ScaledMonomial(cell_polynomial_order, problem_dimension)
     cell_basis_k1 = ScaledMonomial(face_polynomial_order + 1, problem_dimension)
     integration_order = unknown.integration_order
+    integration_order = 2 * (face_polynomial_order + 1)
     # print(integration_order)
     # ------------------------------------------------------------------------------------------------------------------
     # Initilaizing Face objects

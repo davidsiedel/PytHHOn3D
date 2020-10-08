@@ -21,7 +21,7 @@ def test_segment_volume():
     assert np.abs(s.volume - expected_volume) < 1.0e-9
 
 
-polynomial_orders = [1, 2, 3, 4, 5]
+polynomial_orders = [1, 2, 3, 4, 5, 6, 7, 8]
 
 functions_segment = [
     (lambda x: 2.0 * x ** 1 + 3.0),
@@ -29,6 +29,10 @@ functions_segment = [
     (lambda x: 4.0 * x ** 3 - 4.0 * x ** 2 + 5.0 * x ** 1 - 1.0),
     (lambda x: 7.0 * x ** 4 - 4.0 * x ** 3 + 5.0 * x ** 2 - 1.0 * x ** 1 + 9.0),
     (lambda x: 2.0 * x ** 5 - 1.0 * x ** 4 + 1.0 * x ** 3 - 3.0 * x ** 2 + 1.0 * x ** 1 - 6.0),
+    (lambda x: 2.0 * x ** 6 - 1.0 * x ** 4 + 1.0 * x ** 3 - 3.0 * x ** 2 + 1.0 * x ** 1 - 9.0),
+    (lambda x: 2.0 * x ** 7 - 1.0 * x ** 5 + 1.0 * x ** 6 - 3.0 * x ** 2 + 1.0 * x ** 1 - 4.0),
+    (lambda x: 2.0 * x ** 8 - 1.0 * x ** 3 + 1.0 * x ** 7 - 3.0 * x ** 2 + 1.0 * x ** 1 - 2.0),
+    # (lambda x: 2.0 * x),
 ]
 
 test_data = []
@@ -40,11 +44,11 @@ for k in polynomial_orders:
 def test_segment_quadrature(k, expected):
     segment = np.array([[0.0], [1.0]])
     s = Segment(segment, k)
-    quadrature_points, quadrature_weights = s.quadrature_nodes, s.quadrature_weights
+    quadrature_points, quadrature_weights = s.quadrature_points, s.quadrature_weights
     numerical_integral = np.sum(
         [
             quadrature_weight * functions_segment[k - 1](quadrature_point[0])
-            for quadrature_point, quadrature_weight in zip(s.quadrature_nodes, s.quadrature_weights)
+            for quadrature_point, quadrature_weight in zip(s.quadrature_points, s.quadrature_weights)
         ]
     )
     assert np.abs(numerical_integral - expected) < 1.0e-9

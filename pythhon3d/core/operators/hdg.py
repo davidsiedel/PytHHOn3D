@@ -122,17 +122,25 @@ class HDG(Operator):
                 local_gradient_operator[r0:r1, :] = m_cell_phi_k_phi_k_inv @ local_gradient_operator[r0:r1, :]
         return local_gradient_operator
 
-    def get_discrete_mass_operator(
+    def get_local_mass_operator(
         self,
         cell: Cell,
         faces: List[Face],
         cell_basis_l: Basis,
         cell_basis_k: Basis,
+        cell_basis_k1: Basis,
         face_basis_k: Basis,
         unknown: Unknown,
     ) -> Mat:
-
-        return np.zeros((2, 2))
+        local_problem_size = self.get_local_problem_size(faces, cell_basis_l, face_basis_k, unknown)
+        local_mass_operator = np.zeros((local_problem_size, local_problem_size))
+        m_cell_phi_l_phi_l = Integration.get_cell_mass_matrix_in_cell(cell, cell_basis_l, cell_basis_l)
+        directions = range(unknown.field_dimension)
+        for i in directions:
+            r0 = i * cell_basis_l.basis_dimension
+            r1 = (i + 1) * cell_basis_l.basis_dimension
+            local_mass_operator[r0:r1, r0:r1] += m_cell_phi_l_phi_l
+        return local_mass_operator
 
     def get_stabilization_operator(
         self,
@@ -194,24 +202,3 @@ class HDG(Operator):
                 h_f = 1.0 / face.diameter
                 local_stabilization_operator += h_f * m_stab_face_jump.T @ m_face_psi_k_psi_k_inv @ m_stab_face_jump
         return local_stabilization_operator
-
-    def get_line_from_indices(self, i: int, j: int, unknown: Unknown) -> int:
-        """
-        ================================================================================================================
-        Description :
-        ================================================================================================================
-        
-        ================================================================================================================
-        Parameters :
-        ================================================================================================================
-        
-        ================================================================================================================
-        Exemple :
-        ================================================================================================================
-        """
-        for line, index in enumerate(unknown.indices):
-            if index[0] == i and index[1] == j:
-                return line
-            if unknown.symmetric_gradient and index[0] == j and index[1] == i:
-                return line
-        raise ValueError("ATtention")

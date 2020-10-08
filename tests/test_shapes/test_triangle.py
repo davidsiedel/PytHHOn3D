@@ -21,7 +21,7 @@ def test_triangle_volume():
     assert t.volume == expected_volume
 
 
-polynomial_orders = [1, 2, 3, 4, 5]
+polynomial_orders = [1, 2, 3, 4, 5, 6, 7, 8]
 
 functions_triangle = [
     (lambda y, x: 2.0 * x ** 1 + 3.0 * y ** 1 + 7.0),
@@ -29,6 +29,9 @@ functions_triangle = [
     (lambda y, x: 4.0 * x ** 3 - 4.0 * x ** 2 + 5.0 * x - 1.0 + 4.0 * y ** 3),
     (lambda y, x: 7.0 * x ** 4 - 4.0 * x ** 3 + 5.0 * x ** 2 - 1.0 * x + 9.0 + 5.0 * y ** 4),
     (lambda y, x: 2.0 * x ** 5 - 1.0 * x ** 4 + 1.0 * x ** 3 - 3.0 * x ** 2 + 1.0 * x - 6.0 + 6.0 * y ** 5),
+    (lambda y, x: 2.0 * x ** 3 * y ** 3 + 1.0 * x ** 3 - 3.0 * x ** 2 + 1.0 * x - 6.0 + 6.0 * y ** 6),
+    (lambda y, x: 2.0 * x ** 3 * y ** 4 + 1.0 * x ** 3 - 3.0 * y ** 7 + 1.0 * x - 6.0 + 6.0 * y ** 7),
+    (lambda y, x: 2.0 * x ** 4 * y ** 4 + 1.0 * x ** 3 - 3.0 * y ** 7 + 1.0 * x - 6.0 + 6.0 * y ** 8),
 ]
 
 test_data = []
@@ -44,7 +47,7 @@ def test_triangle_quadrature(k, expected):
     numerical_integral = np.sum(
         [
             quadrature_weight * functions_triangle[k - 1](quadrature_point[1], quadrature_point[0])
-            for quadrature_point, quadrature_weight in zip(t.quadrature_nodes, t.quadrature_weights)
+            for quadrature_point, quadrature_weight in zip(t.quadrature_points, t.quadrature_weights)
         ]
     )
     assert np.abs(numerical_integral - expected) < 1.0e-9
