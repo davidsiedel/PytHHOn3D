@@ -37,12 +37,12 @@ functions_segment = [
 
 test_data = []
 for k in polynomial_orders:
-    test_data.append((k, integrate.quad(functions_segment[k - 1], 0.0, 1.0)[0]))
+    test_data.append((k, integrate.quad(functions_segment[k - 1], 0.0, 1.2)[0]))
 
 
 @pytest.mark.parametrize("k, expected", test_data)
 def test_segment_quadrature(k, expected):
-    segment = np.array([[0.0], [1.0]])
+    segment = np.array([[0.0], [1.2]])
     s = Segment(segment, k)
     quadrature_points, quadrature_weights = s.quadrature_points, s.quadrature_weights
     numerical_integral = np.sum(
@@ -51,7 +51,7 @@ def test_segment_quadrature(k, expected):
             for quadrature_point, quadrature_weight in zip(s.quadrature_points, s.quadrature_weights)
         ]
     )
-    assert np.abs(numerical_integral - expected) < 1.0e-9
+    assert np.abs(numerical_integral - expected) < 1.0e-10
 
 
 # integral_bounds = [

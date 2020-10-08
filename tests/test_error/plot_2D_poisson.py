@@ -7,10 +7,10 @@ import os
 from tests.test_error.analysis_2d import *
 
 number_of_elements = 5
-face_polynomial_order = 2
-cell_polynomial_order = 2
-operator_type = "HHO"
-stabilization_parameter = 1.0
+face_polynomial_order = 3
+cell_polynomial_order = 3
+operator_type = "HDG"
+stabilization_parameter = 100.0
 
 fig, (ax0, ax1, ax2) = plt.subplots(nrows=1, ncols=3, sharex=True)
 fig.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.3, hspace=None)

@@ -118,7 +118,7 @@ def compute_2D_error(
     anal_sol = lambda x: -(1.0 / (2.0 * np.pi) ** 2) * (np.sin(2.0 * np.pi * x[0]))
     error = 0.0
     for i in range(len(quadrature_points)):
-        error += (anal_sol(quadrature_points[i]) - unknowns_at_quadrature_points[0][i]) * quadrature_weights[i]
+        error += np.abs((anal_sol(quadrature_points[i]) - unknowns_at_quadrature_points[0][i]) * quadrature_weights[i])
     return error, face_polynomial_order, cell_polynomial_order, operator_type, stabilization_parameter
 
 
@@ -133,6 +133,8 @@ def plot_2D_error(
 ):
     h_0 = h_list[0]
     e_0 = e_list[0]
+    # h_0 = 1.0
+    # e_0 = 1.0
     ax.plot(
         [np.log(h_i / h_0) for h_i in h_list],
         [np.log(e_i / e_0) for e_i in e_list],

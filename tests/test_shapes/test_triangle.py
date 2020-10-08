@@ -36,13 +36,14 @@ functions_triangle = [
 
 test_data = []
 for k in polynomial_orders:
-    test_data.append((k, integrate.dblquad(functions_triangle[k - 1], 0.0, 1.0, lambda x: 0.0, lambda x: 1 - x)[0]))
+    test_data.append(
+        (k, integrate.dblquad(functions_triangle[k - 1], 0.0, 1.2, lambda x: 0.0, lambda x: 1 - (x / 1.2))[0])
+    )
 
 
 @pytest.mark.parametrize("k, expected", test_data)
 def test_triangle_quadrature(k, expected):
-    # vertices = np.array([[0.0, 0.0], [1.0, 1.0], [2.0, 0.0]])
-    triangle = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]])
+    triangle = np.array([[0.0, 0.0], [1.2, 0.0], [0.0, 1.0]])
     t = Triangle(triangle, k)
     numerical_integral = np.sum(
         [
@@ -50,4 +51,4 @@ def test_triangle_quadrature(k, expected):
             for quadrature_point, quadrature_weight in zip(t.quadrature_points, t.quadrature_weights)
         ]
     )
-    assert np.abs(numerical_integral - expected) < 1.0e-9
+    assert np.abs(numerical_integral - expected) < 1.0e-10

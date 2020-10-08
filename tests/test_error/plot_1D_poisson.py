@@ -6,7 +6,7 @@ import matplotlib.patches as mpatches
 import os
 from tests.test_error.analysis_1d import *
 
-number_of_elements = 10
+number_of_elements = 100
 face_polynomial_order = 1
 cell_polynomial_order = 2
 operator_type = "HDG"

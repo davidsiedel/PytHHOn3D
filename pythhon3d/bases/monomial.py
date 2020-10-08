@@ -36,6 +36,7 @@ class ScaledMonomial(Basis):
         self.conformal_gradients = []
         for dx in range(domain_dimension):
             grad_dx = self.get_gradient_operator(polynomial_order, domain_dimension, dx)
+            print("grad_dx : \n{}".format(grad_dx))
             self.conformal_gradients.append(grad_dx)
 
     def get_exponents(self, polynomial_order: int, domain_dimension: int) -> Mat:
@@ -150,6 +151,7 @@ class ScaledMonomial(Basis):
                 for j, exponents in enumerate(self.exponents):
                     if (exponents == d_exponents_matrix[i]).all():
                         gradient_operator[i, j] = coef
+                        # gradient_operator[j, i] = coef
                         break
         return gradient_operator
 
