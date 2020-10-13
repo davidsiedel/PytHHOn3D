@@ -28,6 +28,16 @@ for (face_polynomial_order, cell_polynomial_order), color in zip(orders, colors)
     plot_1D_error(h_list, e_list, face_polynomial_order, cell_polynomial_order, expected_convergence_rate, ax, color)
 ax.set_xlabel("$\log(h/h_0)$ with $h_0 = 1/5$")
 ax.set_ylabel("logartithmic $L^2$-error")
+ax.set_title("{}, stab $= {}$".format(operator_type, stabilization_parameter))
 plt.legend()
 plt.grid(True)
-plt.show()
+serial = "".join(random.choices(string.ascii_uppercase + string.digits, k=10))
+image_file_path = os.path.join(
+    source, "plots/1D_{}_L2error_k{}convergence_{}.png".format(operator_type, expected_convergence_rate, serial)
+)
+while os.path.exists(image_file_path):
+    serial = "".join(random.choices(string.ascii_uppercase + string.digits, k=10))
+    image_file_path = os.path.join(
+        source, "plots/1D_{}_L2error_k{}convergence_{}.png".format(operator_type, expected_convergence_rate, serial,),
+    )
+plt.savefig(image_file_path, dpi=fig.dpi)

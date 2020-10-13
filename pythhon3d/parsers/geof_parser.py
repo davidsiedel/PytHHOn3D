@@ -80,6 +80,10 @@ def parse_geof_file(geof_file_path):
                         else:
                             start_point = 0
                         nodes = [int(item.replace("\n", "")) - 1 for item in c[i].split(" ")[start_point:]]
+                        # print(c[i])
+                        # nodes = [
+                        #     int(item.replace("\n", "").replace(" ", "")) - 1 for item in c[i].split(" ")[start_point:]
+                        # ]
                         Nset_nodes += nodes
                     else:
                         nsets[Nset_name] = Nset_nodes

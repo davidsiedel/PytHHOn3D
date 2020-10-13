@@ -13,6 +13,7 @@ from core.cell import Cell
 from core.unknown import Unknown
 from core.operators.operator import Operator
 from core.operators.hdg import HDG
+from core.operators.hdgs import HDGs
 from core.operators.hho import HHO
 from core.pressure import Pressure
 from core.displacement import Displacement
@@ -507,6 +508,11 @@ def solve(
         x_cell = Condensation.get_cell_unknown(m_cell_cell_inv, m_cell_faces, v_cell, x_faces)
         x_cell_list.append(x_cell)
         x_faces_list.append(x_faces)
+        x_element = np.zeros((len(x_cell) + len(x_faces),))
+        p1 = cell_basis_l.basis_dimension * unknown.field_dimension
+        x_element[:p1] += x_cell
+        x_element[p1:] += x_faces
+        # operators[cell_index]
         # --------------------------------------------------------------------------------------------------------------
         cell_vertices_connectivity_matrix = cells_vertices_connectivity_matrix[cell_index]
         local_vertices = vertices[cell_vertices_connectivity_matrix]
@@ -595,6 +601,8 @@ def get_operator(
         """
     if operator_type == "HDG":
         op = HDG(cell, faces, cell_basis_l, cell_basis_k, face_basis_k, unknown)
+    elif operator_type == "HDGs":
+        op = HDGs(cell, faces, cell_basis_l, cell_basis_k, face_basis_k, unknown)
     elif operator_type == "HHO":
         op = HHO(cell, faces, cell_basis_l, cell_basis_k, cell_basis_k1, face_basis_k, unknown)
     else:

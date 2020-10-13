@@ -21,6 +21,14 @@ def test_triangle_volume():
     assert t.volume == expected_volume
 
 
+def test_triangle_diameter():
+    triangle = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]])
+    polynomial_order = 1
+    t = Triangle(triangle, polynomial_order)
+    expected_diameter = np.sqrt(2.0)
+    assert t.diameter == expected_diameter
+
+
 polynomial_orders = [1, 2, 3, 4, 5, 6, 7, 8]
 
 functions_triangle = [
@@ -31,7 +39,17 @@ functions_triangle = [
     (lambda y, x: 2.0 * x ** 5 - 1.0 * x ** 4 + 1.0 * x ** 3 - 3.0 * x ** 2 + 1.0 * x - 6.0 + 6.0 * y ** 5),
     (lambda y, x: 2.0 * x ** 3 * y ** 3 + 1.0 * x ** 3 - 3.0 * x ** 2 + 1.0 * x - 6.0 + 6.0 * y ** 6),
     (lambda y, x: 2.0 * x ** 3 * y ** 4 + 1.0 * x ** 3 - 3.0 * y ** 7 + 1.0 * x - 6.0 + 6.0 * y ** 7),
-    (lambda y, x: 2.0 * x ** 4 * y ** 4 + 1.0 * x ** 3 - 3.0 * y ** 7 + 1.0 * x - 6.0 + 6.0 * y ** 8),
+    # (lambda y, x: 2.0 * x ** 4 * y ** 4 + 1.0 * x ** 3 - 3.0 * y ** 7 + 1.0 * x - 6.0 + 6.0 * y ** 8),
+    (
+        lambda y, x: 2.0 * (x ** 4) * (y ** 4)
+        + 1.0 * x ** 3
+        - 3.0 * y ** 7
+        + 1.0 * x
+        - 6.0
+        + 6.0 * y ** 8
+        - 123.0 * x ** 8
+        + 530.0 * (x ** 3) * (y ** 4)
+    ),
 ]
 
 test_data = []

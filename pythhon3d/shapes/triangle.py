@@ -79,4 +79,9 @@ class Triangle(Domain):
         triangle_origin_vertex_vector = np.tile(vertices[0], (shape_dimension + 1, 1))
         triangle_edges = (vertices - triangle_origin_vertex_vector)[1:]
         triangle_diameter = max([np.sqrt((e[1] + e[0]) ** 2) for e in triangle_edges])
+        e_0 = vertices[1] - vertices[0]
+        e_1 = vertices[2] - vertices[1]
+        e_2 = vertices[2] - vertices[0]
+        edges = [e_0, e_1, e_2]
+        triangle_diameter = max([np.sqrt(e[0] ** 2 + e[1] ** 2) for e in edges])
         return triangle_diameter
