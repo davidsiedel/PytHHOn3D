@@ -94,6 +94,7 @@ def build(
         cell_vertices = vertices[cell_vertices_connectivity_matrix]
         cell = Cell(cell_vertices, cell_connectivity_matrix, integration_order)
         cells.append(cell)
+    print("DONE")
     # ------------------------------------------------------------------------------------------------------------------
     # Initilaizing Elements objects
     # ------------------------------------------------------------------------------------------------------------------

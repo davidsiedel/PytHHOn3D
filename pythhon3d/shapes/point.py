@@ -1,4 +1,4 @@
-from shapes.domain import Domain
+from core.domain import Domain
 from quadratures.dunavant import DunavantRule
 from numpy import ndarray as Mat
 import numpy as np

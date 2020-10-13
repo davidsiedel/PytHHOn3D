@@ -1,4 +1,4 @@
-from shapes.domain import Domain
+from core.domain import Domain
 from quadratures.dunavant import DunavantRule
 from shapes.tetrahedron import Tetrahedron
 from shapes.polygon import Polygon

@@ -3,7 +3,7 @@ from numpy import ndarray as Mat
 from typing import List
 from typing import Callable
 
-from shapes.domain import Domain
+from core.domain import Domain
 
 from shapes.point import Point
 from shapes.segment import Segment
@@ -13,7 +13,7 @@ from shapes.quadrangle import Quadrangle
 
 
 class Face(Domain):
-    def __init__(self, vertices: Mat, polynomial_order: int):
+    def __init__(self, vertices: Mat, quadrature_order: int):
         """
         ================================================================================================================
         Class :
@@ -57,7 +57,7 @@ class Face(Domain):
             quadrature_weights = f.quadrature_weights
             del f
         if face_shape == "SEGMENT":
-            f = Segment(vertices_in_face_reference_frame, polynomial_order)
+            f = Segment(vertices_in_face_reference_frame, quadrature_order)
             centroid = f.centroid
             volume = f.volume
             diameter = f.diameter
@@ -65,7 +65,7 @@ class Face(Domain):
             quadrature_weights = f.quadrature_weights
             del f
         if face_shape == "TRIANGLE":
-            f = Triangle(vertices_in_face_reference_frame, polynomial_order)
+            f = Triangle(vertices_in_face_reference_frame, quadrature_order)
             centroid = f.centroid
             volume = f.volume
             diameter = f.diameter
@@ -73,7 +73,7 @@ class Face(Domain):
             quadrature_weights = f.quadrature_weights
             del f
         if face_shape == "QUADRANGLE":
-            f = Quadrangle(vertices_in_face_reference_frame, polynomial_order)
+            f = Quadrangle(vertices_in_face_reference_frame, quadrature_order)
             centroid = f.centroid
             volume = f.volume
             diameter = f.diameter
@@ -81,7 +81,7 @@ class Face(Domain):
             quadrature_weights = f.quadrature_weights
             del f
         if face_shape == "POLYGON":
-            f = Polygon(vertices_in_face_reference_frame, polynomial_order)
+            f = Polygon(vertices_in_face_reference_frame, quadrature_order)
             centroid = f.centroid
             volume = f.volume
             diameter = f.diameter
@@ -257,7 +257,9 @@ class Face(Domain):
         # --------------------------------------------------------------------------------------------------------------
         is_list = len(points_matrix.shape) - 1
         if is_list:
-            if problem_dimension == 1 or problem_dimension == 2:
+            if problem_dimension == 1:
+                cols = [0]
+            if problem_dimension == 2:
                 cols = [0]
             if problem_dimension == 3:
                 cols = [0, 1]

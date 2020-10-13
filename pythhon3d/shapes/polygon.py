@@ -1,4 +1,4 @@
-from shapes.domain import Domain
+from core.domain import Domain
 from quadratures.dunavant import DunavantRule
 from shapes.triangle import Triangle
 from numpy import ndarray as Mat

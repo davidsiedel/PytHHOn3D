@@ -3,7 +3,7 @@ from numpy import ndarray as Mat
 from typing import List
 from typing import Callable
 
-from shapes.domain import Domain
+from core.domain import Domain
 
 from shapes.segment import Segment
 from shapes.triangle import Triangle
@@ -13,7 +13,7 @@ from shapes.polyhedron import Polyhedron
 
 
 class Cell(Domain):
-    def __init__(self, vertices: Mat, connectivity_matrix: Mat, polynomial_order: int):
+    def __init__(self, vertices: Mat, connectivity_matrix: Mat, quadrature_order: int):
         """
         ================================================================================================================
         Class :
@@ -33,7 +33,7 @@ class Cell(Domain):
         # --------------------------------------------------------------------------------------------------------------
         cell_shape = Cell.get_cell_shape(vertices)
         if cell_shape == "SEGMENT":
-            c = Segment(vertices, polynomial_order)
+            c = Segment(vertices, quadrature_order)
             centroid = c.centroid
             volume = c.volume
             diameter = c.diameter
@@ -41,7 +41,7 @@ class Cell(Domain):
             quadrature_weights = c.quadrature_weights
             del c
         if cell_shape == "TRIANGLE":
-            c = Triangle(vertices, polynomial_order)
+            c = Triangle(vertices, quadrature_order)
             centroid = c.centroid
             volume = c.volume
             diameter = c.diameter
@@ -49,7 +49,7 @@ class Cell(Domain):
             quadrature_weights = c.quadrature_weights
             del c
         if cell_shape == "POLYGON":
-            c = Polygon(vertices, polynomial_order)
+            c = Polygon(vertices, quadrature_order)
             centroid = c.centroid
             volume = c.volume
             diameter = c.diameter
@@ -57,7 +57,7 @@ class Cell(Domain):
             quadrature_weights = c.quadrature_weights
             del c
         if cell_shape == "TETRAHEDRON":
-            c = Tetrahedron(vertices, polynomial_order)
+            c = Tetrahedron(vertices, quadrature_order)
             centroid = c.centroid
             volume = c.volume
             diameter = c.diameter
@@ -65,7 +65,7 @@ class Cell(Domain):
             quadrature_weights = c.quadrature_weights
             del c
         if cell_shape == "POLYHEDRON":
-            c = Polyhedron(vertices, connectivity_matrix, polynomial_order)
+            c = Polyhedron(vertices, connectivity_matrix, quadrature_order)
             centroid = c.centroid
             volume = c.volume
             diameter = c.diameter
